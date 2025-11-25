@@ -1,0 +1,77 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using RealStateApp.Infrastructure.Identity.Entities
+@inject UserManager<AppUser> UserManager
+
+@{
+    Layout = null;
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Agente</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="~/css/panel.css" asp-append-version="true"/>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-dark px-4" style="background-color:#343a40;">
+        <span class="navbar-brand mb-0 h1">
+            <i class="bi bi-person-badge"></i> RealStateApp - Agente
+        </span>
+
+        <div class="text-white d-flex align-items-center">
+            <span class="me-3">Hola, <strong>@($"{user?.FirstName} {user?.LastName}")</strong></span>
+            <a class="btn btn-outline-light btn-sm" asp-area="" asp-controller="Login" asp-action="LogOut">
+                <i class="bi bi-box-arrow-right"></i> Salir
+            </a>
+        </div>
+    </nav>
+
+    <div class="d-flex">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <a class="side-item" href="/Agent/Home">
+                <i class="bi bi-house"></i> Inicio
+            </a>
+
+            <div class="side-section">Perfil</div>
+            <a class="side-item" href="/Agent/Profile">
+                <i class="bi bi-person"></i> Mi perfil
+            </a>
+
+            <div class="side-section">Propiedades</div>
+            <a class="side-item" href="/AgentProperties/Index">
+                <i class="bi bi-building"></i> Mis propiedades
+            </a>
+            <a class="side-item" href="/AgentProperties/Create">
+                <i class="bi bi-plus-lg"></i> Crear propiedad
+            </a>
+
+            <div class="side-section">Ofertas</div>
+            <a class="side-item" href="/AgentOffers/Index">
+                <i class="bi bi-envelope"></i> Ofertas recibidas
+            </a>
+
+            <div class="side-section">Mensajes</div>
+            <a class="side-item" href="/Chat/Index">
+                <i class="bi bi-chat-dots"></i> Chats
+            </a>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-panel">
+            @RenderBody()
+        </main>
+
+    </div>
+
+</body>
+</html>
