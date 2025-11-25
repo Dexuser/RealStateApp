@@ -1,6 +1,6 @@
-namespace RealStateApp.Core.Application.Dtos.User;
+namespace RealStateApp.Core.Application.ViewModels.User;
 
-public class UserDto
+public class UserViewModel
 {
     public required string Id { get; set; }
     public required string FirstName { get; set; }

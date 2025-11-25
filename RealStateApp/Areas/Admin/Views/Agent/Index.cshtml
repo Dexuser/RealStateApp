@@ -1,0 +1,87 @@
+@model List<AgentWithPropertyCountViewModel>
+
+@{
+    ViewBag.Title = "Mantenimiento de agentes";
+}
+
+@{
+    if (ViewBag.Message != null)
+    {
+        @if (ViewBag.Message is string)
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <p class="text-center">@Html.Raw(ViewBag.Message.Replace("\n", "<br />"))</p>
+                <br/>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                @foreach (var line in ViewBag.Message)
+                {
+                    <p class="text-center">@line</p>
+                }
+                <br/>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    }
+}
+
+<div class="row">
+    <div class="card">
+        <div class="card-body">
+            <div>
+                @if (Model.Count() == 0)
+                {
+                    <div class="card-text text-muted text-center">No existe informacion de agentes</div>
+                }
+                else
+                {
+
+                    <table class="table table-striped w-100">
+                        <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Correo</th>
+                            <th>Cantidad de propiedades</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var agent in Model)
+                        {
+                            <tr>
+                                <td>@agent.User.FirstName</td>
+                                <td>@agent.User.LastName</td>
+                                <td>@agent.User.Email</td>
+                                <td>@agent.PropertyCount</td>
+                                <td>
+                                    <div class="me-2">
+                                        <a class="btn  @(agent.User.IsVerified ? "btn-outline-danger" : "btn-outline-success")"
+                                           asp-area="Admin"
+                                           asp-controller="Agent"
+                                           asp-action="ChangeAgentState"
+                                           asp-route-userId="@agent.User.Id"
+                                           asp-route-state="@(!agent.User.IsVerified)">
+                                            @(agent.User.IsVerified ? "Desactivar" : "Activar")
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <a class="btn btn-outline-warning" asp-area="Admin" asp-controller="Agent" asp-action="Delete" asp-route-userId="@agent.User.Id">
+                                           Eliminar 
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>

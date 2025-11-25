@@ -17,6 +17,11 @@ namespace RealStateApp.Core.Application.ViewModels.Login
         [DataType(DataType.EmailAddress)]
         public required string Email { get; set; }
         
+        [Required(ErrorMessage = "El campo cedula es requerido")]
+        [Length(minimumLength:11 , maximumLength:11, ErrorMessage = "El campo cedula solamente puede tener {0} caracteres")]
+        [DataType(DataType.Text)]
+        public required string IdentityCardNumber { get; set; } 
+        
         [Required (ErrorMessage = "El campo numero de telefono es requerido")]
         public required string PhoneNumber { get; set; }
         

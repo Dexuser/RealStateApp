@@ -22,6 +22,9 @@ namespace RealStateApp.Core.Application
             services.AddScoped<IPropertyImprovementService, PropertyImprovementService>();
             services.AddScoped<IPropertyTypeService, PropertyTypeService>();
             services.AddScoped<ISaleTypeService, SaleTypeService>();
+            
+            services.AddScoped<IAgentService, AgentService>();
+            
         }
     }
 }

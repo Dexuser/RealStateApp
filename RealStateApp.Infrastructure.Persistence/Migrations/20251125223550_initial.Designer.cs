@@ -12,8 +12,8 @@ using RealStateApp.Infrastructure.Persistence.Contexts;
 namespace RealStateApp.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(RealStateAppContext))]
-    [Migration("20251124225024_Initial")]
-    partial class Initial
+    [Migration("20251125223550_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

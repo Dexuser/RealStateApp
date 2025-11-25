@@ -12,7 +12,7 @@ using RealStateApp.Infrastructure.Identity.Contexts;
 namespace RealStateApp.Infrastructure.Identity.Migrations
 {
     [DbContext(typeof(IdentityContext))]
-    [Migration("20251125183758_initial")]
+    [Migration("20251125223533_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -184,6 +184,7 @@ namespace RealStateApp.Infrastructure.Identity.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("IdentityCardNumber")
+                        .IsRequired()
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
@@ -235,8 +236,7 @@ namespace RealStateApp.Infrastructure.Identity.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityCardNumber")
-                        .IsUnique()
-                        .HasFilter("[IdentityCardNumber] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");

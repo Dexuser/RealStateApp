@@ -181,6 +181,7 @@ namespace RealStateApp.Infrastructure.Identity.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("IdentityCardNumber")
+                        .IsRequired()
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
@@ -232,8 +233,7 @@ namespace RealStateApp.Infrastructure.Identity.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityCardNumber")
-                        .IsUnique()
-                        .HasFilter("[IdentityCardNumber] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
