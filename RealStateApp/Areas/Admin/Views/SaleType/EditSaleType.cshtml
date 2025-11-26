@@ -1,4 +1,4 @@
-﻿@model CreatePropertyTypeViewModel
+﻿@model EditSaleTypeViewModel
 @{
     ViewData["Title"] = "Crear usuario";
 }
@@ -31,7 +31,8 @@
                     <h3 class="card-title">Rellena este formulario</h3>
                 </div>
                 <div class="card-body">
-                    <form asp-controller="PropertyType" asp-action="CreatePropertyType" method="post">
+                    <form asp-area="Admin" asp-controller="SaleType" asp-action="EditSaleType" method="post">
+                        <input type="hidden" value="@Model.Id"  asp-for="Id"/>
                         <div class="mt-2">
                             <label class="form-label" asp-for="Name">Nombre:</label>
                             <input class="form-control" asp-for="Name"/>
@@ -46,10 +47,10 @@
 
                         <div class="d-flex justify-content-center mt-4">
                             <div class="me-2">
-                                <button class="btn btn-success" type="submit">Crear tipo de propiedad</button>
+                                <button class="btn btn-success" type="submit">Actualizar</button>
                             </div>
                             <div>
-                                <a class="btn btn-warning" asp-area="Admin" asp-controller="PropertyType" asp-action="Index">Volver</a>
+                                <a class="btn btn-warning" asp-area="Admin" asp-controller="SaleType" asp-action="Index" >Volver</a>
                             </div>
                         </div>
                     </form>

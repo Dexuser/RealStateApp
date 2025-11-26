@@ -28,4 +28,11 @@
       <Folder Include="wwwroot\Images\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="Areas\Admin\Views\SaleType\CreatePropertyType.cshtml" />
+      <AdditionalFiles Include="Areas\Admin\Views\SaleType\DeletePropertyType.cshtml" />
+      <AdditionalFiles Include="Areas\Admin\Views\SaleType\EditPropertyType.cshtml" />
+      <AdditionalFiles Include="Areas\Admin\Views\SaleType\Index.cshtml" />
+    </ItemGroup>
+
 </Project>

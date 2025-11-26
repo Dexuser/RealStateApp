@@ -1,8 +1,6 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealStateApp.Core.Domain.Common;
-using RealStateApp.Models;
 
 namespace RealStateApp.Areas.Admin.Controllers;
 

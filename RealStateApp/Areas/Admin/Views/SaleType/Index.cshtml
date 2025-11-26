@@ -1,8 +1,8 @@
 @using System.Security.Claims
-@model List<PropertyTypeWithCountViewModel>
+@model List<SaleTypeWithCountViewModel>
 
 @{
-    ViewBag.Title = "Mantenimiento de desarrolladores";
+    ViewBag.Title = "Mantenimiento de tipos de ventas";
     var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
 }
 
@@ -33,7 +33,7 @@
 
 <div class="row mb-2">
     <div class="justify-content-end">
-        <a class="btn btn-success" asp-controller="PropertyType" asp-action="CreatePropertyType">Agregar un nuevo tipo de propiedad </a>
+        <a class="btn btn-success" asp-controller="SaleType" asp-action="CreateSaleType">Agregar un nuevo tipo de venta</a>
     </div>
 </div>
 
@@ -43,7 +43,7 @@
             <div>
                 @if (Model.Count() == 0)
                 {
-                    <div class="card-text text-muted text-center">No existe informacion de tipos de propiedades </div>
+                    <div class="card-text text-muted text-center">No existe información de tipos de ventas</div>
                 }
                 else
                 {
@@ -58,21 +58,21 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach (var propertyType in Model)
+                        @foreach (var saleType in Model)
                         {
                             <tr>
-                                <td>@propertyType.Name</td>
-                                <td>@propertyType.Description</td>
-                                <td>@propertyType.PropertiesCount</td>
+                                <td>@saleType.Name</td>
+                                <td>@saleType.Description</td>
+                                <td>@saleType.PropertiesCount</td>
                                 <td>
                                     <div class="me-2">
-                                        <a class="btn btn-outline-warning" asp-area="Admin" asp-controller="PropertyType" asp-action="EditPropertyType" asp-route-id="@propertyType.Id">
+                                        <a class="btn btn-outline-warning" asp-area="Admin" asp-controller="SaleType" asp-action="EditSaleType" asp-route-id="@saleType.Id">
                                             Editar 
                                         </a>
                                     </div>
                                         
                                    <div>
-                                        <a class="btn btn-outline-danger" asp-area="Admin" asp-controller="PropertyType" asp-action="DeletePropertyType" asp-route-id="@propertyType.Id">
+                                        <a class="btn btn-outline-danger" asp-area="Admin" asp-controller="SaleType" asp-action="DeleteSaleType" asp-route-id="@saleType.Id">
                                            Eliminar 
                                         </a>
                                     </div>
