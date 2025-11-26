@@ -7,7 +7,7 @@ using RealStateApp.Core.Domain.Interfaces;
 
 namespace RealStateApp.Core.Application.Services;
 
-public class AdminService
+public class AdminService : IAdminService
 {
     private readonly IAccountServiceForWebApp _accountServiceForWebApp;
     private readonly IPropertyRepository _propertyRepository;
@@ -24,12 +24,12 @@ public class AdminService
         return userAdmin;
     }
 
-    public async Task<Result> SetStatusOnAdmin(string userId, bool state)
+    public async Task<Result> SetStatusOnAdminAsync(string userId, bool state)
     {
         return await _accountServiceForWebApp.SetStateOnUser(userId, state);
     }
     
-    public async Task<Result> DeleteAdmin(string userId)
+    public async Task<Result> DeleteAdminAsync(string userId)
     {
         return await _accountServiceForWebApp.DeleteAsync(userId);
     }

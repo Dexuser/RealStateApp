@@ -24,6 +24,7 @@ namespace RealStateApp.Core.Application
             services.AddScoped<ISaleTypeService, SaleTypeService>();
             
             services.AddScoped<IAgentService, AgentService>();
+            services.AddScoped<IAdminService, AdminService>();
             
         }
     }

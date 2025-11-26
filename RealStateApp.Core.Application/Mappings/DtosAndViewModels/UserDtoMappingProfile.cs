@@ -1,5 +1,7 @@
 using AutoMapper;
 using RealStateApp.Core.Application.Dtos.User;
+using RealStateApp.Core.Application.ViewModels.Admin;
+using RealStateApp.Core.Application.ViewModels.Agent;
 using RealStateApp.Core.Application.ViewModels.Login;
 using RealStateApp.Core.Application.ViewModels.User;
 
@@ -13,5 +15,11 @@ public class UserDtoMappingProfile : Profile
         CreateMap<UserDto, UserViewModel>().ReverseMap();
         CreateMap<UserSaveDto, UserDto>().ReverseMap();
         CreateMap<CreateClientOrAgentViewModel, UserSaveDto>().ReverseMap();
+        CreateMap<CreateAdminViewModel, UserSaveDto>().ReverseMap();
+        CreateMap<EditAdminViewModel, UserSaveDto>().ReverseMap();
+        CreateMap<UserDto, CreateAdminViewModel>().ReverseMap();
+        CreateMap<UserDto, EditAdminViewModel>()
+            .ReverseMap()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
     }
 }

@@ -48,27 +48,23 @@ public class GenericServices<TEntity, TDtoModel> : IGenericService<TDtoModel>
         }
     }
 
-    public virtual async Task<TDtoModel?> AddAsync(TDtoModel dtoModel)
+    public virtual async Task<Result<TDtoModel>> AddAsync(TDtoModel dtoModel)
     {
         try
         {
             TEntity entity = _mapper.Map<TEntity>(dtoModel);
             TEntity? returnEntity = await _repository.AddAsync(entity);
-            if (returnEntity == null)
-            {
-                return null;
-            }
 
             TDtoModel dto = _mapper.Map<TDtoModel>(returnEntity);
-            return dto;
+            return Result<TDtoModel>.Ok(dto);
         }
         catch (Exception e)
         {
-            return null;
+            return Result<TDtoModel>.Fail(e.Message);
         }
     }
 
-    public virtual async Task<List<TDtoModel>> AddRangeAsync(List<TDtoModel> dtomodels)
+    public virtual async Task<Result<List<TDtoModel>>> AddRangeAsync(List<TDtoModel> dtomodels)
     {
         try
         {
@@ -76,15 +72,15 @@ public class GenericServices<TEntity, TDtoModel> : IGenericService<TDtoModel>
             List<TEntity> returnEntities = await _repository.AddRangeAsync(entity);
 
             List<TDtoModel> dtos = _mapper.Map<List<TDtoModel>>(returnEntities);
-            return dtos;
+            return Result<List<TDtoModel>>.Ok(dtos);
         }
         catch (Exception e)
         {
-            return [];
+            return Result<List<TDtoModel>>.Fail(e.Message);
         }
     }
 
-    public virtual async Task<TDtoModel?> UpdateAsync(int id, TDtoModel dtoModel)
+    public virtual async Task<Result<TDtoModel>> UpdateAsync(int id, TDtoModel dtoModel)
     {
         try
         {
@@ -92,28 +88,28 @@ public class GenericServices<TEntity, TDtoModel> : IGenericService<TDtoModel>
             TEntity? returnEntity = await _repository.UpdateAsync(id, entity);
             if (returnEntity == null)
             {
-                return null;
+                return Result<TDtoModel>.Fail("The record could not be updated");
             }
 
             var dto = _mapper.Map<TDtoModel>(returnEntity);
-            return dto;
+            return Result<TDtoModel>.Ok(dto);
         }
         catch (Exception e)
         {
-            return null;
+            return Result<TDtoModel>.Fail(e.Message);
         }
     }
 
-    public virtual async Task<bool> DeleteAsync(int id)
+    public virtual async Task<Result> DeleteAsync(int id)
     {
         try
         {
             await _repository.DeleteAsync(id);
-            return true;
+            return Result.Ok();
         }
         catch (Exception e)
         {
-            return false;
+            return Result.Fail(e.Message);
         }
     }
 }
