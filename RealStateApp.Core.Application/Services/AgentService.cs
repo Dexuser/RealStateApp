@@ -38,12 +38,12 @@ public class AgentService : IAgentService
     }
 
     // Estos metodos simplemente devuelven el Objeto result del accountService
-    public async Task<Result> SetStatusOnAgent(string userId, bool state)
+    public async Task<Result> SetStatus(string userId, bool state)
     {
         return await _accountServiceForWebApp.SetStateOnUser(userId, state);
     }
     
-    public async Task<Result> DeleteAgentAsync(string userId)
+    public async Task<Result> DeleteAsync(string userId)
     {
          var deleteResult = await _accountServiceForWebApp.DeleteAsync(userId);
          if (deleteResult.IsSuccess)

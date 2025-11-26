@@ -1,25 +1,22 @@
-using ArtemisBanking.Core.Application.Dtos.Login;
-using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Domain.Common;
-using RealStateApp.Core.Domain.Interfaces;
 
 namespace RealStateApp.Core.Application.Services;
 
-public class AdminService : IAdminService
+public class DeveloperService : IDeveloperService
 {
     private readonly IAccountServiceForWebApp _accountServiceForWebApp;
 
-    public AdminService(IAccountServiceForWebApp accountServiceForWebApp)
+    public DeveloperService(IAccountServiceForWebApp accountServiceForWebApp)
     {
         _accountServiceForWebApp = accountServiceForWebApp;
     }
 
-    public async Task<List<UserDto>> GetAllAdmins()
+    public async Task<List<UserDto>> GetAllDevelopers()
     {
-        var userAdmin = await _accountServiceForWebApp.GetAllUserOfRole(Roles.Admin, false);
-        return userAdmin;
+        var userDeveloper = await _accountServiceForWebApp.GetAllUserOfRole(Roles.Developer, false);
+        return userDeveloper;
     }
 
     public async Task<Result> SetStateAsync(string userId, bool state)
@@ -34,7 +31,7 @@ public class AdminService : IAdminService
 
     public async Task<Result<UserDto>> Create(UserSaveDto dto, string? origin)
     {
-        dto.Role = nameof(Roles.Admin); // Solo para rectificar. Al fin y al cabo este metodo es un decorador
+        dto.Role = nameof(Roles.Developer); // Solo para rectificar. Al fin y al cabo este metodo es un decorador
         return await _accountServiceForWebApp.RegisterUser(dto, origin);
     }
 

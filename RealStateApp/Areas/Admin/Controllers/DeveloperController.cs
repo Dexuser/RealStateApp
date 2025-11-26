@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
+using RealStateApp.Core.Application.Services;
 using RealStateApp.Core.Application.ViewModels.Admin;
 using RealStateApp.Core.Application.ViewModels.Agent;
+using RealStateApp.Core.Application.ViewModels.Developer;
 using RealStateApp.Core.Application.ViewModels.Login;
 using RealStateApp.Core.Application.ViewModels.User;
 using RealStateApp.Core.Domain.Common;
@@ -14,15 +16,15 @@ namespace RealStateApp.Areas.Admin.Controllers;
 
 [Area("Admin")]
 [Authorize(Roles = $"{nameof(Roles.Admin)}")] 
-public class AdminController : Controller
+public class DeveloperController : Controller
 {
     private readonly IAccountServiceForWebApp _accountServiceForWebApp;
-    private readonly IAdminService _adminService;
+    private readonly IDeveloperService _developerService;
     private readonly IMapper _mapper;
 
-    public AdminController(IAdminService agentService, IMapper mapper, IAccountServiceForWebApp accountServiceForWebApp)
+    public DeveloperController(IDeveloperService agentService, IMapper mapper, IAccountServiceForWebApp accountServiceForWebApp)
     {
-        _adminService = agentService;
+        _developerService = agentService;
         _mapper = mapper;
         _accountServiceForWebApp = accountServiceForWebApp;
     }
@@ -30,14 +32,14 @@ public class AdminController : Controller
     // GET
     public async Task<IActionResult> Index()
     {
-        var agents = await _adminService.GetAllAdmins();
+        var agents = await _developerService.GetAllDevelopers();
         var agentsViewModels = _mapper.Map<List<UserViewModel>>(agents);
         return View(agentsViewModels);
     }
 
-    public IActionResult CreateAdmin()
+    public IActionResult CreateDeveloper()
     {
-        var viewModel = new CreateAdminViewModel
+        var viewModel = new CreateDeveloperViewModel() 
         {
             FirstName = "",
             LastName = "",
@@ -46,13 +48,13 @@ public class AdminController : Controller
             UserName = "",
             Password = "",
             ConfirmPassword = "",
-            Role = nameof(Roles.Admin)
+            Role = nameof(Roles.Developer)
         };
         return View(viewModel);
     }
  
     [HttpPost]
-    public async Task<IActionResult> CreateAdmin(CreateAdminViewModel model)
+    public async Task<IActionResult> CreateDeveloper(CreateDeveloperViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -61,7 +63,7 @@ public class AdminController : Controller
         
         var userSave = _mapper.Map<UserSaveDto>(model);
         var origin = HttpContext.Request.Headers.Origin.FirstOrDefault() ?? "";
-        var createResult = await _adminService.Create(userSave, origin);
+        var createResult = await _developerService.Create(userSave, origin);
 
         if (createResult.IsFailure)
         {
@@ -70,10 +72,10 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    public async Task<IActionResult> EditAdmin(string userId)
+    public async Task<IActionResult> EditDeveloper(string userId)
     {
         
-        var model = new EditAdminViewModel
+        var model = new EditDevViewModel()
         {
             FirstName = "",
             LastName = "",
@@ -93,9 +95,9 @@ public class AdminController : Controller
             return View(model);
         }
 
-        if (user.Role != nameof(Roles.Admin))
+        if (user.Role != nameof(Roles.Developer))
         {
-            ViewBag.Message = "El usuario no es un administrador";
+            ViewBag.Message = "El usuario no es un desarrollador";
             return View(model);
         }
         
@@ -111,7 +113,7 @@ public class AdminController : Controller
     }
     
     [HttpPost]
-    public async Task<IActionResult> EditAdmin(EditAdminViewModel model)
+    public async Task<IActionResult> EditDeveloper(EditDevViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -120,13 +122,13 @@ public class AdminController : Controller
         
         var userSave = _mapper.Map<UserSaveDto>(model);
         var origin = HttpContext.Request.Headers.Origin.FirstOrDefault() ?? "";
-        await _adminService.Edit(userSave, origin);
+        await _developerService.Edit(userSave, origin);
         return RedirectToAction(nameof(Index));
     }
 
     
     
-    public async Task<IActionResult> ChangeAdminState(string userId, bool state)
+    public async Task<IActionResult> ChangeDeveloperState(string userId, bool state)
     {
         var user = await _accountServiceForWebApp.GetUserById(userId);
         if (user is null)
@@ -144,15 +146,22 @@ public class AdminController : Controller
     }
     
     [HttpPost]
-    public async Task<IActionResult> ChangeAdminState(ChangeUserStateViewModel model)
+    public async Task<IActionResult> ChangeDeveloperState(ChangeUserStateViewModel model)
     {
-        var stateResult = await _adminService.SetStateAsync(model.UserId, model.State);
+        var stateResult = await _developerService.SetStateAsync(model.UserId, model.State);
         if (stateResult.IsFailure)
         {
             this.SendValidationErrorMessages(stateResult);
             return View(model);
         }
-        return RedirectToRoute(new {controller = "Admin", action = "Index"});
+        
+        return RedirectToAction(nameof(Index));
     }
     
+    [HttpPost]
+    public async Task<IActionResult> DeletePost(DeleteUserViewModel model)
+    {
+        await _developerService.DeleteAsync(model.UserId);
+        return RedirectToAction(nameof(Index));
+    }
 }

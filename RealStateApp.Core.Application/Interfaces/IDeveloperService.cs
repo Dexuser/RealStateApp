@@ -1,10 +1,10 @@
 using RealStateApp.Core.Application.Dtos.User;
 
-namespace RealStateApp.Core.Application.Interfaces;
+namespace RealStateApp.Core.Application.Services;
 
-public interface IAdminService
+public interface IDeveloperService
 {
-    Task<List<UserDto>> GetAllAdmins();
+    Task<List<UserDto>> GetAllDevelopers();
     Task<Result> SetStateAsync(string userId, bool state);
     Task<Result> DeleteAsync(string userId);
     Task<Result<UserDto>> Create(UserSaveDto dto, string? origin);

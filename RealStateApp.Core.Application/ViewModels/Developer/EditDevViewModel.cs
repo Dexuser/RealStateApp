@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RealStateApp.Core.Application.ViewModels.Admin;
+namespace RealStateApp.Core.Application.ViewModels.Developer;
 
 
-public class EditAdminViewModel
+public class EditDevViewModel
 {
     public required string Id { get; set; }
     [Required(ErrorMessage = "El campo nombre es requerido")]

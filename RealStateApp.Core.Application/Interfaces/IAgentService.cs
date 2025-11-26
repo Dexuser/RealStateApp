@@ -5,6 +5,6 @@ namespace RealStateApp.Core.Application.Interfaces;
 public interface IAgentService
 {
     Task<List<AgentWithPropertyCountDto>> GetAllAgents();
-    Task<Result> SetStatusOnAgent(string userId, bool state);
-    Task<Result> DeleteAgentAsync(string userId);
+    Task<Result> SetStatus(string userId, bool state);
+    Task<Result> DeleteAsync(string userId);
 }

@@ -55,13 +55,14 @@ public class AgentController : Controller
     [HttpPost]
     public async Task<IActionResult> ChangeAgentState(ChangeUserStateViewModel model)
     {
-        var stateResult = await _agentService.SetStatusOnAgent(model.UserId, model.State);
+        var stateResult = await _agentService.SetStatus(model.UserId, model.State);
         if (stateResult.IsFailure)
         {
             this.SendValidationErrorMessages(stateResult);
             return View(model);
         }
-        return RedirectToRoute(new {controller = "Agent", action = "Index"});
+        
+        return RedirectToAction(nameof(Index));
     }
     
 
@@ -84,7 +85,7 @@ public class AgentController : Controller
     [HttpPost]
     public async Task<IActionResult> DeletePost(DeleteUserViewModel model)
     {
-        await _agentService.DeleteAgentAsync(model.UserId);
+        await _agentService.DeleteAsync(model.UserId);
         return RedirectToAction(nameof(Index));
     }
 }
