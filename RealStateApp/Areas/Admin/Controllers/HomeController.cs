@@ -7,7 +7,7 @@ using RealStateApp.Models;
 namespace RealStateApp.Areas.Admin.Controllers;
 
 [Area("Admin")]
-[Authorize(Roles = $"{nameof(Roles.Admin)}")] // Recuerda leer el apartado de seguridad de los requerimientos
+[Authorize(Roles = $"{nameof(Roles.Admin)}")] 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

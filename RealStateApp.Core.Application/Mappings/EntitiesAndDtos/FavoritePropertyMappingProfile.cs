@@ -8,6 +8,6 @@ public class FavoritePropertyMappingProfile : Profile
 {
     public FavoritePropertyMappingProfile()
     {
-        CreateMap<FavoriteProperty, FavoritePropertyDto>();
+        CreateMap<FavoriteProperty, FavoritePropertyDto>().ReverseMap();
     }
 }

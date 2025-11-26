@@ -8,6 +8,6 @@ public class ChatMessageMappingProfile :  Profile
 {
     public ChatMessageMappingProfile()
     {
-        CreateMap<ChatMessage, ChatMessageDto>();
+        CreateMap<ChatMessage, ChatMessageDto>().ReverseMap();
     }
 }

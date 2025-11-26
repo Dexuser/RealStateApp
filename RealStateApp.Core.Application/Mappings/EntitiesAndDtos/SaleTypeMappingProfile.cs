@@ -8,6 +8,6 @@ public class SaleTypeMappingProfile : Profile
 {
     public SaleTypeMappingProfile()
     {
-        CreateMap<SaleType, SaleTypeDto>();
+        CreateMap<SaleType, SaleTypeDto>().ReverseMap();
     }
 }

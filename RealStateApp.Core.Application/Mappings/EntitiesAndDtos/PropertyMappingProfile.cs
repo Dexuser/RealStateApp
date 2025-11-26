@@ -8,7 +8,7 @@ public class PropertyMappingProfile : Profile
 {
     public PropertyMappingProfile()
     {
-        CreateMap<Property, PropertyDto>();
+        CreateMap<Property, PropertyDto>().ReverseMap();
     }
     
 }
