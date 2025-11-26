@@ -61,13 +61,13 @@ public class SaleTypeController : Controller
             Description = "",
         };
         
-        var propertyType = await _saleTypeService.GetByIdAsync(id);
-        if (propertyType == null)
+        var saleTypeDto = await _saleTypeService.GetByIdAsync(id);
+        if (saleTypeDto == null)
         {
             ViewBag.Message = "No se encontró tipo de venta con ese ID";
             return View(model);
         }
-        model = _mapper.Map<EditSaleTypeViewModel>(propertyType);
+        model = _mapper.Map<EditSaleTypeViewModel>(saleTypeDto);
         return View(model);
     }
     
@@ -97,14 +97,14 @@ public class SaleTypeController : Controller
             Description = ""
         };
         
-       var propertyType = await _saleTypeService.GetByIdAsync(id);
-        if (propertyType == null)
+       var saleTypeDto = await _saleTypeService.GetByIdAsync(id);
+        if (saleTypeDto == null)
         {
             ViewBag.Message = "No se encontró algún tipo de venta con ese ID";
             return View(model);
         }
         
-        model = _mapper.Map<SaleTypeViewModel>(propertyType);
+        model = _mapper.Map<SaleTypeViewModel>(saleTypeDto);
         return View(model);
     }
 

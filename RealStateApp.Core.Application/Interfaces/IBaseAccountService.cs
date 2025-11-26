@@ -20,6 +20,7 @@ public interface IBaseAccountService
     Task<List<UserDto>> GetAllUserOfRole(Roles role, bool isActive = true);
     Task<List<string>> GetAllUserIdsOfRole(Roles role, bool isActive = true);
     Task<List<string>> GetAllUsersIds(bool isActive = true);
+    Task<int> CountUsers(Roles? role, bool? onlyActive = null);
     Task<Result> SetStateOnUser(string userId, bool state);
     Task<Result> ConfirmAccountAsync(string userId, string token);
 }

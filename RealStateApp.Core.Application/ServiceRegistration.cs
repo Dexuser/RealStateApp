@@ -26,6 +26,7 @@ namespace RealStateApp.Core.Application
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IDeveloperService, DeveloperService>();
+            services.AddScoped<IDashBoardService, DashBoardService>();
             
         }
     }
