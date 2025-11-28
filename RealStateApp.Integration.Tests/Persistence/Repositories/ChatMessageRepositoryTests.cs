@@ -51,7 +51,9 @@ public class ChatMessageRepositoryTests
             Rooms = 3,
             Bathrooms = 2,
             Description = "Casa bonita",
-            AgentId = Guid.NewGuid().ToString(),
+            AgentId = Guid.NewGuid()
+                .ToString(),
+            CreatedAt = DateTime.Now,
         };
         await context.Set<Property>().AddAsync(property);
 
@@ -120,7 +122,9 @@ public class ChatMessageRepositoryTests
             Rooms = 3,
             Bathrooms = 2,
             Description = "Casa bonita",
-            AgentId = Guid.NewGuid().ToString(),
+            AgentId = Guid.NewGuid()
+                .ToString(),
+            CreatedAt = DateTime.Now,
         };
         
         await context.Set<Property>().AddAsync(property);

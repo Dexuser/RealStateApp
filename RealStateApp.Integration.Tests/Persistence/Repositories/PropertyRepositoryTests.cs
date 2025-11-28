@@ -33,7 +33,8 @@ public class PropertyRepositoryTests
             Rooms = 3,
             Bathrooms = 2,
             Description = "Casa bonita",
-            AgentId = "userid"
+            AgentId = "userid",
+            CreatedAt = DateTime.Now 
         };
 
         await using var context = new RealStateAppContext(_dbOptions);
@@ -76,7 +77,8 @@ public class PropertyRepositoryTests
             Rooms = 3,
             Bathrooms = 2,
             Description = "Casa bonita",
-            AgentId = "userid"
+            AgentId = "userid",
+            CreatedAt = new DateTime(2025, 11, 28) 
         };
         await using var context = new RealStateAppContext(_dbOptions);
         context.Add(property);
@@ -97,6 +99,7 @@ public class PropertyRepositoryTests
         result.Bathrooms.Should().Be(2);
         result.Description.Should().Be("Casa bonita");
         result.AgentId.Should().Be("userid");
+        result.CreatedAt.Should().Be(new DateTime(2025, 11, 28));
     }
 
 
@@ -128,7 +131,9 @@ public class PropertyRepositoryTests
             Rooms = 3,
             Bathrooms = 2,
             Description = "Casa bonita",
-            AgentId = "userid"
+            AgentId = "userid",
+            CreatedAt = DateTime.Now
+            
         };
         await context.AddAsync(property);
         await context.SaveChangesAsync();
@@ -160,7 +165,8 @@ public class PropertyRepositoryTests
             Rooms = 3,
             Bathrooms = 2,
             Description = "Casa bonita",
-            AgentId = "userid"
+            AgentId = "userid",
+            CreatedAt = DateTime.Now
         };
 
         //Act
@@ -187,7 +193,8 @@ public class PropertyRepositoryTests
             Rooms = 3,
             Bathrooms = 2,
             Description = "Casa bonita",
-            AgentId = "userid"
+            AgentId = "userid",
+            CreatedAt = DateTime.Now
         };
         await context.AddAsync(property);
 
@@ -230,7 +237,8 @@ public class PropertyRepositoryTests
                 Rooms = 3,
                 Bathrooms = 2,
                 Description = "Casa bonita",
-                AgentId = "userid1"
+                AgentId = "userid1",
+                CreatedAt = DateTime.Now
             },
             new Property
             {
@@ -243,7 +251,8 @@ public class PropertyRepositoryTests
                 Rooms = 2,
                 Bathrooms = 1,
                 Description = "Casa linda",
-                AgentId = "userid2"
+                AgentId = "userid2",
+                CreatedAt = DateTime.Now
             });
         await context.SaveChangesAsync();
         var repository = new PropertyRepository(context);
@@ -286,7 +295,8 @@ public class PropertyRepositoryTests
             Rooms = 3,
             Bathrooms = 2,
             Description = "Casa bonita",
-            AgentId = "userid"
+            AgentId = "userid",
+            CreatedAt = DateTime.Now
         };
         context.Add(property);
         await context.SaveChangesAsync();
