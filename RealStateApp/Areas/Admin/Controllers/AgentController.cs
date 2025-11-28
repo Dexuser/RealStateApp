@@ -28,7 +28,7 @@ public class AgentController : Controller
     // GET
     public async Task<IActionResult> Index()
     {
-        var agents = await _agentService.GetAllAgents();
+        var agents = await _agentService.GetAllAgentsWithCount();
         var agentsViewModels = _mapper.Map<List<AgentWithPropertyCountViewModel>>(agents);
         return View(agentsViewModels);
     }

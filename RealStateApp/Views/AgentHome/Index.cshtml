@@ -1,0 +1,54 @@
+﻿@model List<UserViewModel>
+
+@{
+    ViewData["Title"] = "Agentes";
+}
+
+<h2 class="mb-4">Agentes</h2>
+
+<form method="get" asp-action="Index" class="mb-4">
+    <div class="input-group w-50">
+        <input type="text" name="name" value="@Context.Request.Query["search"]"
+               class="form-control" placeholder="Buscar agente por nombre..." />
+        <button class="btn btn-primary" type="submit">Buscar</button>
+    </div>
+</form>
+
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    @foreach (var agent in Model)
+    {
+        <div class="col">
+            <a asp-action="Properties" asp-route-AgentId="@agent.Id" 
+               class="text-decoration-none text-dark">
+                
+                <div class="card shadow-sm h-100 text-center p-3">
+
+                    <!-- Foto circular -->
+                    <div class="d-flex justify-content-center">
+                        <img src="@agent.ProfileImagePath"
+                             class="rounded-circle"
+                             style="width: 120px; height: 120px; object-fit: cover;" />
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            @agent.FirstName @agent.LastName
+                        </h5>
+
+                        <p class="card-text mb-1">
+                            <strong>Email:</strong> @agent.Email
+                        </p>
+
+                        @if (!string.IsNullOrEmpty(agent.PhoneNumber))
+                        {
+                            <p class="card-text">
+                                <strong>Tel:</strong> @agent.PhoneNumber
+                            </p>
+                        }
+                    </div>
+                </div>
+
+            </a>
+        </div>
+    }
+</div>

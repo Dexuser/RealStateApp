@@ -32,7 +32,7 @@ public class HomeController : Controller
         _mapper = mapper;
     }
 
-    public async Task<IActionResult> Index(HomeIndexFilters filters)
+    public async Task<IActionResult> Index(PropertyViewModelFilters filters)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user != null)
@@ -55,6 +55,12 @@ public class HomeController : Controller
             PropertyTypes = _mapper.Map<List<PropertyTypeViewModel>>(await _propertyTypeService.GetAllAsync()),
             Filters = filters, 
         };
+        return View(model);
+    }
+
+    public async Task<IActionResult> Details(int id)
+    {
+        var model = _mapper.Map<PropertyViewModel>(await _propertyService.GetByIdAsync(id));
         return View(model);
     }
 

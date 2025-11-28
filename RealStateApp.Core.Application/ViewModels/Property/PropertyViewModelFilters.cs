@@ -1,6 +1,6 @@
-namespace RealStateApp.Core.Application.Dtos.Property;
+namespace RealStateApp.Core.Application.ViewModels.Property;
 
-public class PropertyFiltersDto
+public class PropertyViewModelFilters
 {
     public string? AgentId { get; set; }
     public int? SelectedPropertyTypeId { get; set; }

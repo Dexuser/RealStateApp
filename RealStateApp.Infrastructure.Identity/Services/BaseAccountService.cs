@@ -329,7 +329,9 @@ namespace RealStateApp.Infrastructure.Identity.Services
                 IsVerified = user.EmailConfirmed,
                 RegisteredAt = user.RegisteredAt,
                 Role = rolesList[0],
-                IdentityCardNumber = user.IdentityCardNumber
+                IdentityCardNumber = user.IdentityCardNumber,
+                ProfileImagePath = user.ProfileImagePath,
+                PhoneNumber = user.PhoneNumber
             };
 
             return userDto;
@@ -361,7 +363,9 @@ namespace RealStateApp.Infrastructure.Identity.Services
                     IsVerified = user.EmailConfirmed,
                     RegisteredAt = user.RegisteredAt,
                     Role = roleList[0],
-                    IdentityCardNumber = user.IdentityCardNumber
+                    IdentityCardNumber = user.IdentityCardNumber,
+                    ProfileImagePath = user.ProfileImagePath,
+                    PhoneNumber = user.PhoneNumber
                 });
             }
 
@@ -387,7 +391,9 @@ namespace RealStateApp.Infrastructure.Identity.Services
                 IsVerified = user.EmailConfirmed,
                 RegisteredAt = user.RegisteredAt,
                 Role = role.ToString(),
-                IdentityCardNumber = user.IdentityCardNumber
+                IdentityCardNumber = user.IdentityCardNumber,
+                ProfileImagePath = user.ProfileImagePath,
+                PhoneNumber = user.PhoneNumber
             }));
             return listUsersDtos; 
         }
