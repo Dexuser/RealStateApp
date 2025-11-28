@@ -24,6 +24,7 @@ public class PropertyEntityConfiguration : IEntityTypeConfiguration<Property>
         builder.Property(p => p.Description).HasMaxLength(1999);
         builder.Property(p => p.IsAvailable).HasDefaultValue(true);
         builder.Property(p => p.AgentId).HasMaxLength(450).IsRequired();
+        builder.Property(p => p.CreatedAt).IsRequired();
 
         builder.HasOne(p => p.PropertyType)
             .WithMany(pt => pt.Properties)

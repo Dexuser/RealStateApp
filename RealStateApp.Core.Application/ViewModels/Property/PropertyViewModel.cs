@@ -18,21 +18,17 @@ public class PropertyViewModel
 {
     public required int Id { get; set; }
     public required string Code { get; set; } // 6 digit unique
-
     public required int PropertyTypeId { get; set; }
     public PropertyTypeViewModel? PropertyType { get; set; }
-
     public required int SaleTypeId { get; set; }
     public SaleTypeViewModel? SaleType { get; set; }
-
     public required decimal Price { get; set; }
     public required double SizeInMeters { get; set; }
     public required int Rooms { get; set; }
     public required int Bathrooms { get; set; }
     public required string Description { get; set; }
-    public bool IsAvailable { get; set; } // true = available, false = 
-
-
+    public bool IsAvailable { get; set; } // true = available, false = sold
+    public required DateTime CreatedAt { get; set; }
     public required string AgentId { get; set; }
 
     // Navigation
