@@ -1,6 +1,6 @@
 using RealStateApp.Core.Application.Dtos.DashBoard;
 
-namespace RealStateApp.Core.Application.Services;
+namespace RealStateApp.Core.Application.Interfaces;
 
 public interface IDashBoardService
 {

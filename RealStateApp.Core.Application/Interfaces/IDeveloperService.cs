@@ -1,6 +1,6 @@
 using RealStateApp.Core.Application.Dtos.User;
 
-namespace RealStateApp.Core.Application.Services;
+namespace RealStateApp.Core.Application.Interfaces;
 
 public interface IDeveloperService
 {

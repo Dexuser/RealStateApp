@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Application.Services;
 using RealStateApp.Core.Application.ViewModels.DashBoard;
 using RealStateApp.Core.Domain.Common;
