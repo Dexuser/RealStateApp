@@ -30,7 +30,8 @@ public class PropertyViewModel
     public required int Rooms { get; set; }
     public required int Bathrooms { get; set; }
     public required string Description { get; set; }
-    public bool IsAvailable { get; set; } // true = available, false = sold
+    public bool IsAvailable { get; set; } // true = available, false = 
+
 
     public required string AgentId { get; set; }
 

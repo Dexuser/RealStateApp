@@ -1,5 +1,148 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model HomeIndexViewModel
+
+@{
+    ViewData["Title"] = "Listado de Propiedades";
 }
 
-<h2 class="display-6"> BienVenido usuario no logeado</h2>
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- ==== SIDEBAR DE FILTROS ==== -->
+        <div class="col-md-3 col-lg-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h5 class="mb-3">Filtros</h5>
+                    <form asp-area="" asp-controller="Home" asp-action="Index" method="get">
+
+                        <!-- Tipo de propiedad -->
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Propiedad</label>
+                            <select class="form-select" name="Filters.SelectedPropertyTypeId">
+                                <option value="">Todos</option>
+                                @foreach (var type in Model.PropertyTypes)
+                                {
+                                    if (type.Id == Model.Filters.SelectedPropertyTypeId)
+                                    {
+                                        <option value="@type.Id" selected="selected">@type.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@type.Id">@type.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Precio mínimo -->
+                        <div class="mb-3">
+                            <label class="form-label">Precio Mínimo</label>
+                            <input type="number"
+                                   name="Filters.MinValue"
+                                   class="form-control"
+                                   value="@Model.Filters.MinValue" />
+                        </div>
+
+                        <!-- Precio máximo -->
+                        <div class="mb-3">
+                            <label class="form-label">Precio Máximo</label>
+                            <input type="number"
+                                   name="Filters.MaxValue"
+                                   class="form-control"
+                                   value="@Model.Filters.MaxValue" />
+                        </div>
+
+                        <!-- Habitaciones -->
+                        <div class="mb-3">
+                            <label class="form-label">Habitaciones</label>
+                            <input type="number"
+                                   name="Filters.Rooms"
+                                   class="form-control"
+                                   value="@Model.Filters.Rooms" />
+                        </div>
+
+                        <!-- Baños -->
+                        <div class="mb-3">
+                            <label class="form-label">Baños</label>
+                            <input type="number"
+                                   name="Filters.Bathrooms"
+                                   class="form-control"
+                                   value="@Model.Filters.Bathrooms" />
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">Buscar</button>
+                            <a asp-action="Index" class="btn btn-secondary">Limpiar</a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ==== LISTADO DE PROPIEDADES ==== -->
+        <div class="col-md-9 col-lg-9">
+            <div class="row">
+
+                @if (Model.Properties == null || !Model.Properties.Any())
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            No se encontraron propiedades con los filtros seleccionados.
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var prop in Model.Properties)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card shadow-sm h-100">
+
+                                @{
+                                    var imagePath = prop.PropertyImages.Single().ImagePath; 
+                                }
+                                
+                                <img src="@imagePath"
+                                     class="card-img-top"
+                                     alt="Imagen de propiedad"
+                                     style="height: 180px; object-fit: cover;" />
+
+                                <div class="card-body">
+                                    <h5 class="card-title">Tipo: @prop.PropertyType!.Name</h5>
+                                    <p class="card-text text-muted mb-2">
+                                        Codigo: @prop.Code
+                                    </p>
+                                    <p class="card-text text-muted mb-2">
+                                        Tipo de venta: @prop.SaleType!.Name
+                                    </p>
+                                    <p class="fw-bold text-primary">
+                                        RD$ @prop.Price.ToString("N0")
+                                    </p>
+
+                                    <ul class="list-inline small">
+                                        <li class="list-inline-item"><i class="bi bi-door-open"></i> @prop.Rooms Hab.</li>
+                                        <li class="list-inline-item"><i class="bi bi-droplet"></i> @prop.Bathrooms Baños</li>
+                                        <li class="list-inline-item"><i class="bi bi-bounding-box-circles"></i> @prop.SizeInMeters mt</li>
+                                    </ul>
+
+                                </div>
+
+                                <div class="card-footer bg-white">
+                                    <a asp-action="Details" asp-route-id="@prop.Id"
+                                       class="btn btn-outline-primary w-100">
+                                        Ver Detalles
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+
+    </div>
+</div>

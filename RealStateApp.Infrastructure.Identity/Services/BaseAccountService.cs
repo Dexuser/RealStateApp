@@ -258,7 +258,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
             return userDto;
         }
 
-        public virtual async Task<List<UserDto>> GetUsersByIds(List<string> ids)
+        public virtual async Task<List<UserDto>> GetUsersByIds(IEnumerable<string> ids)
         {
             var users = await _userManager.Users.Where(u => ids.Contains(u.Id)).ToListAsync();
 

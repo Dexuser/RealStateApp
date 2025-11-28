@@ -13,7 +13,7 @@ public interface IBaseAccountService
     Task<Result> DeleteAsync(string id);
     Task<UserDto?> GetUserByEmail(string email);
     Task<UserDto?> GetUserById(string id);
-    Task<List<UserDto>> GetUsersByIds(List<string> ids);
+    Task<List<UserDto>> GetUsersByIds(IEnumerable<string> ids);
     Task<UserDto?> GetUserByUserName(string userName);
     Task<UserDto?> GetByIdentityCardNumber(string identityCardNumber);
     Task<List<UserDto>> GetAllUser(bool? isActive = true);
