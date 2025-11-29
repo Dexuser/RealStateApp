@@ -1,0 +1,26 @@
+@model PropertyTypeViewModel
+
+@{
+    ViewBag.Title = "Eliminar tipo de propiedad";
+}
+
+<div class="row">
+    <div class="col-12 col-md-4 offset-4">
+        <div class="card">
+            <div class="card-header text-center text-light bg-danger">
+                <h5 class="card-title">
+                    ¿Esta seguro de que desea eliminar el tipo de propiedad @($"{Model.Name}") y todas las propiedades de este tipo?
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-controller="PropertyType" asp-action="DeletePropertyType" method="post">
+                    <input type="hidden" asp-for="Id" value="@Model.Id"/>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-danger me-2">Aceptar</button>
+                        <a class="btn btn-warning" asp-controller="PropertyType" asp-action="Index" class="btn btn-outline-warning">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -9,6 +9,6 @@ public class PropertyImageMappingProfile : Profile
 
     public PropertyImageMappingProfile()
     {
-        CreateMap<PropertyImage, PropertyImageDto>();
+        CreateMap<PropertyImage, PropertyImageDto>().ReverseMap();
     }
 }

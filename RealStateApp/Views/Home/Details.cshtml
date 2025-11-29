@@ -1,0 +1,199 @@
+@model RealStateApp.Core.Application.ViewModels.Property.PropertyViewModel
+
+@{
+    ViewData["Title"] = $"Propiedad {Model.Code}";
+}
+
+<div class="container py-4">
+
+    <!-- ===================================== -->
+    <!--            SLIDER IMÁGENES            -->
+    <!-- ===================================== -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+
+                    @if (Model.PropertyImages != null && Model.PropertyImages.Any())
+                    {
+                        int i = 0;
+                        foreach (var img in Model.PropertyImages)
+                        {
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@img.ImagePath"
+                                     class="d-block w-100"
+                                     style="height: 460px; object-fit: cover; border-radius:12px;"/>
+                            </div>
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        <div class="carousel-item active">
+                            <img src="/images/no-image.png" class="d-block w-100"/>
+                        </div>
+                    }
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================== -->
+    <!--     CONTENIDO PRINCIPAL + AGENTE      -->
+    <!-- ===================================== -->
+    <div class="row">
+
+        <!-- ===================================== -->
+        <!--          COLUMNA IZQUIERDA            -->
+        <!-- ===================================== -->
+        <div class="col-md-8">
+
+            <!-- ======== DESCRIPCIÓN ======== -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Descripción</h4>
+                    <p class="text-muted">@Model.Description</p>
+                </div>
+            </div>
+
+            <!-- ======== CARACTERÍSTICAS ======== -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Características</h4>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Precio:</strong><br/>
+                                RD$ @Model.Price.ToString("N0")
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Tamaño:</strong><br/>
+                                @Model.SizeInMeters m²
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Habitaciones:</strong><br/>
+                                @Model.Rooms
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Baños:</strong><br/>
+                                @Model.Bathrooms
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Tipo de Propiedad:</strong><br/>
+                                @Model.PropertyType?.Name
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Tipo de Venta:</strong><br/>
+                                @Model.SaleType?.Name
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Estado:</strong><br/>
+                                @(Model.IsAvailable ? "Disponible" : "Vendida")
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Publicada el:</strong><br/>
+                                @Model.CreatedAt.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- ======== MEJORAS ======== -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Mejoras de la Propiedad</h4>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        @foreach (var improvement in Model.PropertyImprovements)
+                        {
+                            <span class="badge bg-light text-dark border rounded-1 px-3 py-2 d-flex align-items-center" style="font-size: 0.95rem;">
+                                <i class="bi bi-check2-circle text-success me-2 fs-5"></i>
+                                @improvement.Improvement!.Name
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!--        COLUMNA DERECHA (AGENTE)       -->
+        <!-- ===================================== -->
+        <div class="col-md-4">
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+
+                    <h5 class="mb-3">Agente Encargado</h5>
+
+                    @if (Model.Agent != null)
+                    {
+                        <img src="@Model.Agent.ProfileImagePath"
+                             class="rounded-circle mb-3"
+                             style="width: 120px; height: 120px; object-fit: cover;"/>
+
+                        <h5 class="fw-bold">@Model.Agent.FirstName @Model.Agent.LastName</h5>
+                        <p class="text-muted">@Model.Agent.Email</p>
+
+                        <hr/>
+
+                        <p><i class="bi bi-telephone"></i> @Model.Agent.PhoneNumber</p>
+
+                        <a href="https://wa.me/@Model.Agent.PhoneNumber" target="_blank"
+                           class="btn btn-success w-100 mb-2">
+                            <i class="bi bi-whatsapp"></i> WhatsApp
+                        </a>
+
+                        <a href="mailto:@Model.Agent.Email" class="btn btn-primary w-100">
+                            <i class="bi bi-envelope"></i> Enviar Email
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No se encontró información del agente.</p>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

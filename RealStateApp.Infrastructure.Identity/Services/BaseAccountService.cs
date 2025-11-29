@@ -258,7 +258,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
             return userDto;
         }
 
-        public virtual async Task<List<UserDto>> GetUsersByIds(List<string> ids)
+        public virtual async Task<List<UserDto>> GetUsersByIds(IEnumerable<string> ids)
         {
             var users = await _userManager.Users.Where(u => ids.Contains(u.Id)).ToListAsync();
 
@@ -329,7 +329,9 @@ namespace RealStateApp.Infrastructure.Identity.Services
                 IsVerified = user.EmailConfirmed,
                 RegisteredAt = user.RegisteredAt,
                 Role = rolesList[0],
-                IdentityCardNumber = user.IdentityCardNumber
+                IdentityCardNumber = user.IdentityCardNumber,
+                ProfileImagePath = user.ProfileImagePath,
+                PhoneNumber = user.PhoneNumber
             };
 
             return userDto;
@@ -361,7 +363,9 @@ namespace RealStateApp.Infrastructure.Identity.Services
                     IsVerified = user.EmailConfirmed,
                     RegisteredAt = user.RegisteredAt,
                     Role = roleList[0],
-                    IdentityCardNumber = user.IdentityCardNumber
+                    IdentityCardNumber = user.IdentityCardNumber,
+                    ProfileImagePath = user.ProfileImagePath,
+                    PhoneNumber = user.PhoneNumber
                 });
             }
 
@@ -387,7 +391,9 @@ namespace RealStateApp.Infrastructure.Identity.Services
                 IsVerified = user.EmailConfirmed,
                 RegisteredAt = user.RegisteredAt,
                 Role = role.ToString(),
-                IdentityCardNumber = user.IdentityCardNumber
+                IdentityCardNumber = user.IdentityCardNumber,
+                ProfileImagePath = user.ProfileImagePath,
+                PhoneNumber = user.PhoneNumber
             }));
             return listUsersDtos; 
         }

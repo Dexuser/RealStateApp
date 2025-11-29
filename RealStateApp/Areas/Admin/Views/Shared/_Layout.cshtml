@@ -40,39 +40,36 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
 
-            <a class="side-item"  asp-area="Admin" asp-controller="Home" asp-action="Index">
+            <a class="side-item" asp-area="Admin" asp-controller="Home" asp-action="Index">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
+            
 
             <div class="side-section">Usuarios</div>
             <a class="side-item" asp-area="Admin" asp-controller="Agent" asp-action="Index">
-                <i class="bi bi-person-badge"></i> Agentes aqui se edito
+                <i class="bi bi-person-badge"></i> Agentes
             </a>
-            <a class="side-item"  asp-area="Admin" asp-controller="Client" asp-action="Index">
-                <i class="bi bi-people"></i> Clientes
-            </a>
-            <a class="side-item"  asp-area="Admin" asp-controller="Home" asp-action="Developers">
+            <a class="side-item" asp-area="Admin" asp-controller="Developer" asp-action="Index">
                 <i class="bi bi-terminal"></i> Desarrolladores
             </a>
-
-            <div class="side-section">Propiedades</div>
-            <a class="side-item" asp-area="" asp-controller="" asp-action="">
-                <i class="bi bi-building"></i> Propiedades
-            </a>
-            <a class="side-item"  asp-area="" asp-controller="" asp-action="">
-                <i class="bi bi-tags"></i> Tipos
+            <a class="side-item" asp-area="Admin" asp-controller="Admin" asp-action="Index">
+                <i class="bi bi-shield-lock"></i> Administradores
             </a>
 
-            <div class="side-section">Negocios</div>
-            <a class="side-item" asp-area="" asp-controller="" asp-action="">
-                <i class="bi bi-cash-coin"></i> Ofertas
-            </a>
 
             <div class="side-section">Sistema</div>
-            <a class="side-item" asp-area="" asp-controller="" asp-action="">
-                <i class="bi bi-gear"></i> Configuración
-            </a>
 
+            <a class="side-item" asp-area="Admin" asp-controller="PropertyType" asp-action="Index">
+                <i class="bi bi-tags"></i> Tipos de propiedades
+            </a>
+            
+            <a class="side-item" asp-area="Admin" asp-controller="SaleType" asp-action="Index">
+                <i class="bi bi-tags"></i> Tipos de ventas 
+            </a>
+            
+            <a class="side-item" asp-area="Admin" asp-controller="Improvement" asp-action="Index">
+                <i class="bi bi-wrench-adjustable"></i> Mejoras
+            </a>
         </aside>
 
         <!-- MAIN CONTENT -->

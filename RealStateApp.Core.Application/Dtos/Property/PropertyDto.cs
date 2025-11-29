@@ -27,7 +27,7 @@ public class PropertyDto
     public required int Bathrooms { get; set; }
     public required string Description { get; set; }
     public bool IsAvailable { get; set; } // true = available, false = sold
-
+    public required DateTime CreatedAt { get; set; }
     public required string AgentId { get; set; }
 
     // Navigation

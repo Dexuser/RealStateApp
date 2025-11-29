@@ -1,0 +1,89 @@
+@using System.Security.Claims
+@model List<SaleTypeWithCountViewModel>
+
+@{
+    ViewBag.Title = "Mantenimiento de tipos de ventas";
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+}
+
+@{
+    if (ViewBag.Message != null)
+    {
+        @if (ViewBag.Message is string)
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <p class="text-center">@Html.Raw(ViewBag.Message.Replace("\n", "<br />"))</p>
+                <br/>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                @foreach (var line in ViewBag.Message)
+                {
+                    <p class="text-center">@line</p>
+                }
+                <br/>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    }
+}
+
+<div class="row mb-2">
+    <div class="justify-content-end">
+        <a class="btn btn-success" asp-controller="SaleType" asp-action="CreateSaleType">Agregar un nuevo tipo de venta</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="card">
+        <div class="card-body">
+            <div>
+                @if (Model.Count() == 0)
+                {
+                    <div class="card-text text-muted text-center">No existe información de tipos de ventas</div>
+                }
+                else
+                {
+
+                    <table class="table table-striped w-100">
+                        <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Cantidad de propiedades de este tipo</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var saleType in Model)
+                        {
+                            <tr>
+                                <td>@saleType.Name</td>
+                                <td>@saleType.Description</td>
+                                <td>@saleType.PropertiesCount</td>
+                                <td>
+                                    <div class="me-2">
+                                        <a class="btn btn-outline-warning" asp-area="Admin" asp-controller="SaleType" asp-action="EditSaleType" asp-route-id="@saleType.Id">
+                                            Editar 
+                                        </a>
+                                    </div>
+                                        
+                                   <div>
+                                        <a class="btn btn-outline-danger" asp-area="Admin" asp-controller="SaleType" asp-action="DeleteSaleType" asp-route-id="@saleType.Id">
+                                           Eliminar 
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>

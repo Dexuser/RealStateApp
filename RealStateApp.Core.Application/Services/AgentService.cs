@@ -18,7 +18,7 @@ public class AgentService : IAgentService
         _propertyRepository = propertyRepository;
     }
 
-    public async Task<List<AgentWithPropertyCountDto>> GetAllAgents()
+    public async Task<List<AgentWithPropertyCountDto>> GetAllAgentsWithCount()
     {
         var userAgents = await _accountServiceForWebApp.GetAllUserOfRole(Roles.Agent, false);
         var agentsWithPropertyCount = new List<AgentWithPropertyCountDto>();
@@ -36,14 +36,27 @@ public class AgentService : IAgentService
         }
         return agentsWithPropertyCount;
     }
+    
+    public async Task<List<UserDto>> GetAllAgents(bool onlyActive = false, string? name = null)
+    {
+        var userAgents = await _accountServiceForWebApp.GetAllUserOfRole(Roles.Agent, onlyActive);
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            userAgents.RemoveAll(u => !$"{u.FirstName} {u.LastName}".Contains(name, StringComparison.InvariantCultureIgnoreCase));
+        }
+        userAgents = userAgents.OrderBy(u => u.FirstName).ToList();
+
+        return userAgents;
+    }
 
     // Estos metodos simplemente devuelven el Objeto result del accountService
-    public async Task<Result> SetStatusOnAgent(string userId, bool state)
+    public async Task<Result> SetStatus(string userId, bool state)
     {
         return await _accountServiceForWebApp.SetStateOnUser(userId, state);
     }
     
-    public async Task<Result> DeleteAgentAsync(string userId)
+    public async Task<Result> DeleteAsync(string userId)
     {
          var deleteResult = await _accountServiceForWebApp.DeleteAsync(userId);
          if (deleteResult.IsSuccess)

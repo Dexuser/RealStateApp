@@ -13,13 +13,14 @@ public interface IBaseAccountService
     Task<Result> DeleteAsync(string id);
     Task<UserDto?> GetUserByEmail(string email);
     Task<UserDto?> GetUserById(string id);
-    Task<List<UserDto>> GetUsersByIds(List<string> ids);
+    Task<List<UserDto>> GetUsersByIds(IEnumerable<string> ids);
     Task<UserDto?> GetUserByUserName(string userName);
     Task<UserDto?> GetByIdentityCardNumber(string identityCardNumber);
     Task<List<UserDto>> GetAllUser(bool? isActive = true);
     Task<List<UserDto>> GetAllUserOfRole(Roles role, bool isActive = true);
     Task<List<string>> GetAllUserIdsOfRole(Roles role, bool isActive = true);
     Task<List<string>> GetAllUsersIds(bool isActive = true);
+    Task<int> CountUsers(Roles? role, bool? onlyActive = null);
     Task<Result> SetStateOnUser(string userId, bool state);
     Task<Result> ConfirmAccountAsync(string userId, string token);
 }

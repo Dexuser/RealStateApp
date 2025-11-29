@@ -8,6 +8,6 @@ public class OfferMappingProfile : Profile
 {
     public OfferMappingProfile()
     {
-        CreateMap<Offer, OfferDto>();
+        CreateMap<Offer, OfferDto>().ReverseMap();
     }
 }

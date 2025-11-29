@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RealStateApp.Core.Application.ViewModels.Login
+namespace RealStateApp.Core.Application.ViewModels.Admin
 {
     public class CreateAdminViewModel
     {

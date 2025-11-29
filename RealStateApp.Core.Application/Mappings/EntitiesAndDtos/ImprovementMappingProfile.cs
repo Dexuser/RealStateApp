@@ -8,6 +8,6 @@ public class ImprovementMappingProfile : Profile
 {
     public ImprovementMappingProfile()
     {
-        CreateMap<Improvement, ImprovementDto>();
+        CreateMap<Improvement, ImprovementDto>().ReverseMap();
     }
 }

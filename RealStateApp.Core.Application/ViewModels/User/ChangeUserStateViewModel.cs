@@ -1,4 +1,4 @@
-namespace RealStateApp.Core.Application.Dtos.User;
+namespace RealStateApp.Core.Application.ViewModels.User;
 
 public class ChangeUserStateViewModel
 {

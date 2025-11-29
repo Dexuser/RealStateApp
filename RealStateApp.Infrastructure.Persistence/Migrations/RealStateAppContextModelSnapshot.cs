@@ -160,6 +160,9 @@ namespace RealStateApp.Infrastructure.Persistence.Migrations
                         .HasMaxLength(9)
                         .HasColumnType("nvarchar(9)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1999)

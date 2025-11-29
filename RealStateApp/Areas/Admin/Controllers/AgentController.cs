@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
-using RealStateApp.Core.Application.Services;
 using RealStateApp.Core.Application.ViewModels.Agent;
-using RealStateApp.Core.Application.ViewModels.Login;
+using RealStateApp.Core.Application.ViewModels.User;
 using RealStateApp.Core.Domain.Common;
 using RealStateApp.Extensions;
 
@@ -29,7 +28,7 @@ public class AgentController : Controller
     // GET
     public async Task<IActionResult> Index()
     {
-        var agents = await _agentService.GetAllAgents();
+        var agents = await _agentService.GetAllAgentsWithCount();
         var agentsViewModels = _mapper.Map<List<AgentWithPropertyCountViewModel>>(agents);
         return View(agentsViewModels);
     }
@@ -55,13 +54,14 @@ public class AgentController : Controller
     [HttpPost]
     public async Task<IActionResult> ChangeAgentState(ChangeUserStateViewModel model)
     {
-        var stateResult = await _agentService.SetStatusOnAgent(model.UserId, model.State);
+        var stateResult = await _agentService.SetStatus(model.UserId, model.State);
         if (stateResult.IsFailure)
         {
             this.SendValidationErrorMessages(stateResult);
             return View(model);
         }
-        return RedirectToRoute(new {controller = "Agent", action = "Index"});
+        
+        return RedirectToAction(nameof(Index));
     }
     
 
@@ -84,7 +84,7 @@ public class AgentController : Controller
     [HttpPost]
     public async Task<IActionResult> DeletePost(DeleteUserViewModel model)
     {
-        await _agentService.DeleteAgentAsync(model.UserId);
+        await _agentService.DeleteAsync(model.UserId);
         return RedirectToAction(nameof(Index));
     }
 }
