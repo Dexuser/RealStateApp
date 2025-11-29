@@ -10,26 +10,19 @@ using RealStateApp.Infrastructure.Identity.Entities;
 
 namespace RealStateApp.Controllers;
 
-public class LoginController : Controller
+public class LoginController(
+    IMapper mapper,
+    IAccountServiceForWebApp accountServiceForWebApp,
+    UserManager<AppUser> userManager)
+    : Controller
 {
-    private readonly IMapper _mapper;
-    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
-    private readonly UserManager<AppUser> _userManager;
-
-    public LoginController(IMapper mapper, IAccountServiceForWebApp accountServiceForWebApp, UserManager<AppUser> userManager)
-    {
-        _mapper = mapper;
-        _accountServiceForWebApp = accountServiceForWebApp;
-        _userManager = userManager;
-    }
-
     // GET
     public async Task<IActionResult> Index()
     {
-        var user = await _userManager.GetUserAsync(User);
+        var user = await userManager.GetUserAsync(User);
         if (user != null)
         {
-            var role =  await _userManager.GetRolesAsync(user);
+            var role =  await userManager.GetRolesAsync(user);
             return await RedirectToHomeByRole(role[0]);
         }
         
@@ -44,8 +37,8 @@ public class LoginController : Controller
             return View("Index",loginViewModel);
         }
         
-        var loginDto = _mapper.Map<LoginDto>(loginViewModel);
-        var result = await _accountServiceForWebApp.AuthenticateAsync(loginDto);
+        var loginDto = mapper.Map<LoginDto>(loginViewModel);
+        var result = await accountServiceForWebApp.AuthenticateAsync(loginDto);
         
         if (result.IsFailure)
         {
@@ -59,7 +52,7 @@ public class LoginController : Controller
 
     public async Task<IActionResult> LogOut()
     {
-        await _accountServiceForWebApp.SignOutAsync();
+        await accountServiceForWebApp.SignOutAsync();
         return RedirectToRoute(new { controller = "Login", action = "Index" });
     }
 
@@ -76,9 +69,9 @@ public class LoginController : Controller
         {
             return View(vm);
         }
-        string origin = Request?.Headers?.Origin.ToString() ?? string.Empty;
+        var origin = Request.Headers?.Origin.ToString() ?? string.Empty;
         ForgotPasswordRequestDto dto = new() { UserName = vm.UserName,Origin = origin};
-        var result = await _accountServiceForWebApp.ForgotPasswordAsync(dto);
+        var result = await accountServiceForWebApp.ForgotPasswordAsync(dto);
 
         if (result.IsFailure)
         {
@@ -115,7 +108,7 @@ public class LoginController : Controller
             Token = vm.Token
         };
 
-        var result = await _accountServiceForWebApp.ResetPasswordAsync(dto);
+        var result = await accountServiceForWebApp.ResetPasswordAsync(dto);
 
         if (result.IsFailure)
         {
@@ -130,7 +123,7 @@ public class LoginController : Controller
 
     private async Task<IActionResult> RedirectToHomeByRole(string role)
     {
-        if (Roles.TryParse(role, out Roles userRole))
+        if (Enum.TryParse(role, out Roles userRole))
         {
             switch (userRole)
             {
@@ -145,7 +138,7 @@ public class LoginController : Controller
            }
         }
         
-        await _accountServiceForWebApp.SignOutAsync();
+        await accountServiceForWebApp.SignOutAsync();
         ViewBag.Message = "Los usuarios de rol desarrollador solamente pueden acceder por la API";
         return View("Index", new LoginViewModel
         {
@@ -163,7 +156,7 @@ public class LoginController : Controller
     
     public async Task<IActionResult> ConfirmEmail(string userId,string token)
     {
-        var result = await _accountServiceForWebApp.ConfirmAccountAsync(userId, token);
+        var result = await accountServiceForWebApp.ConfirmAccountAsync(userId, token);
         if (result.IsFailure)
         {
             return View("ConfirmEmail", result.GeneralError);
