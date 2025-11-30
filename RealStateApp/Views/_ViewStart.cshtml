@@ -1,3 +1,12 @@
 ﻿@{
-    Layout = "_LayoutBase"; // para los usuarios no Autenticados
+    if (User.Identity == null)
+    {
+        Layout = "_LayoutBase";
+    }
+    else
+    {
+        Layout = User.Identity.IsAuthenticated 
+            ? "~/Areas/Client/Views/Shared/_Layout.cshtml" : 
+            "_LayoutBase";       
+    }
 }

@@ -8,7 +8,14 @@ namespace RealStateApp.Core.Application.Services;
 
 public class FavoritePropertyService : GenericServices<FavoriteProperty, FavoritePropertyDto>, IFavoritePropertyService
 {
-    public FavoritePropertyService(IFavoritePropertyRepository repository, IMapper mapper) : base(repository, mapper)
+    private readonly IFavoritePropertyRepository _favoritePropertyRepository; 
+    public FavoritePropertyService(IFavoritePropertyRepository repository, IMapper mapper, IFavoritePropertyRepository favoritePropertyRepository) : base(repository, mapper)
     {
+        _favoritePropertyRepository = favoritePropertyRepository;
+    }
+
+    public async Task ToggleFavoriteAsync(int propertyId, string userId)
+    {
+        await _favoritePropertyRepository.ToggleFavoriteAsync(propertyId, userId);
     }
 }

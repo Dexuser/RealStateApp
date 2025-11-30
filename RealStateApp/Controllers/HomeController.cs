@@ -1,8 +1,10 @@
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Text.Json;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using RealStateApp.Core.Application.Dtos.Property;
 using RealStateApp.Core.Application.Exceptions;
 using RealStateApp.Core.Application.Interfaces;
@@ -18,42 +20,49 @@ namespace RealStateApp.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly UserManager<AppUser> _userManager;
+    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
     private readonly IPropertyService _propertyService;
     private readonly IPropertyTypeService _propertyTypeService;
+    private readonly IFavoritePropertyService _favoritePropertyService;
     private readonly IMapper _mapper;
 
-    public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager, IPropertyService propertyService, IPropertyTypeService propertyTypeService, IMapper mapper)
+    public HomeController(ILogger<HomeController> logger, IPropertyService propertyService,
+        IPropertyTypeService propertyTypeService, IMapper mapper, IAccountServiceForWebApp accountServiceForWebApp, IFavoritePropertyService favoritePropertyService)
     {
         _logger = logger;
-        _userManager = userManager;
         _propertyService = propertyService;
         _propertyTypeService = propertyTypeService;
         _mapper = mapper;
+        _accountServiceForWebApp = accountServiceForWebApp;
+        _favoritePropertyService = favoritePropertyService;
     }
 
     public async Task<IActionResult> Index(PropertyViewModelFilters filters)
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user != null)
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+        var user = await _accountServiceForWebApp.GetUserById(userId);
+        if (user != null && user.Role != nameof(Roles.Client))
         {
             return RedirectToRoute(new { area = "", controller = "Login", action = "Index" });
         }
 
-        var filtersDto = new PropertyFiltersDto()
+        var filtersDto = new PropertyFiltersDto
         {
             SelectedPropertyTypeId = filters.SelectedPropertyTypeId,
             Bathrooms = filters.Bathrooms,
             MaxValue = filters.MaxValue,
             MinValue = filters.MinValue,
             Rooms = filters.Rooms,
+            ClientId = userId,
+            OnlyFavorites = filters.OnlyFavorites,
         };
-        
+
         var model = new HomeIndexViewModel()
         {
-            Properties = _mapper.Map<List<PropertyViewModel>>(await _propertyService.GetAllAvailablePropertiesAsync(filtersDto)),
+            Properties =
+                _mapper.Map<List<PropertyViewModel>>(await _propertyService.GetAllAvailablePropertiesAsync(filtersDto)),
             PropertyTypes = _mapper.Map<List<PropertyTypeViewModel>>(await _propertyTypeService.GetAllAsync()),
-            Filters = filters, 
+            Filters = filters,
         };
         return View(model);
     }
@@ -62,6 +71,22 @@ public class HomeController : Controller
     {
         var model = _mapper.Map<PropertyViewModel>(await _propertyService.GetByIdAsync(id));
         return View(model);
+    }
+    
+    
+    
+    [HttpPost]
+    public async Task<IActionResult> ToggleFavorite(int propertyId, PropertyViewModelFilters filters)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+        await _favoritePropertyService.ToggleFavoriteAsync(propertyId, userId);
+
+        return RedirectToAction(nameof(Index), filters);
     }
 
     public IActionResult Privacy()
@@ -91,6 +116,7 @@ public class HomeController : Controller
 
         return View("Index");
     }
+
     public IActionResult Error()
     {
         var json = HttpContext.Session.GetString("ProblemDetails");
@@ -113,5 +139,4 @@ public class HomeController : Controller
             Status = 500
         });
     }
-
 }

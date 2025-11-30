@@ -5,5 +5,5 @@ namespace RealStateApp.Core.Application.Interfaces;
 
 public interface IFavoritePropertyService : IGenericService<FavoritePropertyDto>
 {
-    
+    Task ToggleFavoriteAsync(int propertyId, string userId);
 }

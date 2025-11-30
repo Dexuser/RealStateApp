@@ -1,0 +1,43 @@
+@model PropertyViewModel
+
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card shadow-sm h-100">
+
+        @{
+            var imagePath = Model.PropertyImages.Single().ImagePath;
+        }
+
+        <img src="@imagePath"
+             class="card-img-top"
+             alt="Imagen de propiedad"
+             style="height: 180px; object-fit: cover;"/>
+
+        <div class="card-body">
+            <h5 class="card-title">Tipo: @Model.PropertyType!.Name</h5>
+            <p class="card-text text-muted mb-2">
+                Codigo: @Model.Code
+            </p>
+            <p class="card-text text-muted mb-2">
+                Tipo de venta: @Model.SaleType!.Name
+            </p>
+            <p class="fw-bold text-primary">
+                RD$ @Model.Price.ToString("N0")
+            </p>
+
+            <ul class="list-inline small">
+                <li class="list-inline-item"><i class="bi bi-door-open"></i> @Model.Rooms Hab.</li>
+                <li class="list-inline-item"><i class="bi bi-droplet"></i> @Model.Bathrooms Baños</li>
+                <li class="list-inline-item"><i class="bi bi-bounding-box-circles"></i> @Model.SizeInMeters mt</li>
+            </ul>
+
+        </div>
+
+        <div class="card-footer bg-white">
+            <a asp-action="Details" asp-route-id="@Model.Id"
+               class="btn btn-outline-primary w-100">
+                Ver Detalles
+            </a>
+        </div>
+
+    </div>
+</div>

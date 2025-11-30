@@ -1,0 +1,5 @@
+﻿@{
+    Layout = User.Identity.IsAuthenticated 
+        ? "~/Areas/Client/Views/Shared/_Layout.cshtml" : 
+        "_LayoutBase";
+}

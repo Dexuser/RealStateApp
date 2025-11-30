@@ -30,6 +30,7 @@ public class PropertyViewModel
     public bool IsAvailable { get; set; } // true = available, false = sold
     public required DateTime CreatedAt { get; set; }
     public required string AgentId { get; set; }
+    public bool IsFavorite { get; set; }
 
     // Navigation
     public ICollection<PropertyImageViewModel> PropertyImages { get; set; } = [];

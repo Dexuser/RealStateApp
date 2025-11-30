@@ -1,6 +1,7 @@
 using RealStateApp.Core.Application.Dtos.Property;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.ViewModels.Property;
+using RealStateApp.Core.Application.ViewModels.User;
 using RealStateApp.Core.Domain.Common;
 
 namespace RealStateApp.Core.Application.ViewModels.Offer;
@@ -16,5 +17,5 @@ public class OfferViewModel
     public required DateTime CreatedAt { get; set; }
     public required OfferStatus Status { get; set; }
     
-    public PropertyViewModel? User { get; set; }
+    public UserViewModel? User { get; set; }
 }

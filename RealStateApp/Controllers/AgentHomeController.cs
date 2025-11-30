@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using RealStateApp.Core.Application.Dtos.Property;
@@ -34,6 +35,8 @@ public class AgentHomeController : Controller
 
     public async Task<IActionResult> Properties(PropertyViewModelFilters filters)
     {
+        
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
         var filtersDto = new PropertyFiltersDto
         {
             AgentId = filters.AgentId,
@@ -42,6 +45,8 @@ public class AgentHomeController : Controller
             MaxValue = filters.MaxValue,
             Bathrooms = filters.Bathrooms,
             Rooms = filters.Rooms,
+            ClientId = userId,
+            OnlyFavorites = false,
         };
         
         var model = new AgentPropertiesViewModel()

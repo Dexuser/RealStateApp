@@ -16,7 +16,8 @@ public class LoginController : Controller
     private readonly IAccountServiceForWebApp _accountServiceForWebApp;
     private readonly UserManager<AppUser> _userManager;
 
-    public LoginController(IMapper mapper, IAccountServiceForWebApp accountServiceForWebApp, UserManager<AppUser> userManager)
+    public LoginController(IMapper mapper, IAccountServiceForWebApp accountServiceForWebApp,
+        UserManager<AppUser> userManager)
     {
         _mapper = mapper;
         _accountServiceForWebApp = accountServiceForWebApp;
@@ -29,28 +30,28 @@ public class LoginController : Controller
         var user = await _userManager.GetUserAsync(User);
         if (user != null)
         {
-            var role =  await _userManager.GetRolesAsync(user);
+            var role = await _userManager.GetRolesAsync(user);
             return await RedirectToHomeByRole(role[0]);
         }
-        
-        return View(new LoginViewModel() {UserName = "",  Password = ""});
+
+        return View(new LoginViewModel() { UserName = "", Password = "" });
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> LogIn(LoginViewModel loginViewModel)
     {
         if (!ModelState.IsValid)
         {
-            return View("Index",loginViewModel);
+            return View("Index", loginViewModel);
         }
-        
+
         var loginDto = _mapper.Map<LoginDto>(loginViewModel);
         var result = await _accountServiceForWebApp.AuthenticateAsync(loginDto);
-        
+
         if (result.IsFailure)
         {
             this.SendValidationErrorMessages(result);
-            return View("Index",loginViewModel);
+            return View("Index", loginViewModel);
         }
 
         var user = result.Value!;
@@ -66,9 +67,9 @@ public class LoginController : Controller
 
     public IActionResult ForgotPassword()
     {
-        return View(new ForgotPasswordRequestViewModel() {UserName = ""} );
+        return View(new ForgotPasswordRequestViewModel() { UserName = "" });
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestViewModel vm)
     {
@@ -76,21 +77,22 @@ public class LoginController : Controller
         {
             return View(vm);
         }
+
         string origin = Request?.Headers?.Origin.ToString() ?? string.Empty;
-        ForgotPasswordRequestDto dto = new() { UserName = vm.UserName,Origin = origin};
+        ForgotPasswordRequestDto dto = new() { UserName = vm.UserName, Origin = origin };
         var result = await _accountServiceForWebApp.ForgotPasswordAsync(dto);
 
         if (result.IsFailure)
         {
             this.SendValidationErrorMessages(result);
             return View(vm);
-        }          
+        }
 
         return RedirectToRoute(new { controller = "Login", action = "Index" });
     }
 
     public IActionResult ResetPassword(string userId, string token)
-    {           
+    {
         return View(new ResetPasswordRequestViewModel()
         {
             Id = userId,
@@ -99,14 +101,14 @@ public class LoginController : Controller
             ConfirmPassword = "",
         });
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> ResetPassword(ResetPasswordRequestViewModel vm)
     {
         if (!ModelState.IsValid)
         {
             return View(vm);
-        }  
+        }
 
         ResetPasswordRequestDto dto = new()
         {
@@ -127,7 +129,6 @@ public class LoginController : Controller
     }
 
 
-
     private async Task<IActionResult> RedirectToHomeByRole(string role)
     {
         if (Roles.TryParse(role, out Roles userRole))
@@ -135,16 +136,20 @@ public class LoginController : Controller
             switch (userRole)
             {
                 case Roles.Admin:
-                    return RedirectToRoute(new { area="Admin" ,controller = "Home", action = "Index" });
+                    return RedirectToRoute(new { area = "Admin", controller = "Home", action = "Index" });
 
                 case Roles.Agent:
-                    return RedirectToRoute(new { area="Agent" ,controller = "Home", action = "Index" });
-                
+                    return RedirectToRoute(new { area = "Agent", controller = "Home", action = "Index" });
+
                 case Roles.Client:
-                    return RedirectToRoute(new { area="Client" , controller = "Home", action = "Index" });
-           }
+                    return RedirectToRoute(new { area = "", controller = "Home", action = "Index" });
+                
+                // Los clientes comparten la vista de propiedades (Home/Index) y detalles (Home/Details)
+                // Por eso se redireccionan nuevamente al Home.
+               
+            }
         }
-        
+
         await _accountServiceForWebApp.SignOutAsync();
         ViewBag.Message = "Los usuarios de rol desarrollador solamente pueden acceder por la API";
         return View("Index", new LoginViewModel
@@ -158,17 +163,16 @@ public class LoginController : Controller
     {
         return View();
     }
-    
 
-    
-    public async Task<IActionResult> ConfirmEmail(string userId,string token)
+
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
     {
         var result = await _accountServiceForWebApp.ConfirmAccountAsync(userId, token);
         if (result.IsFailure)
         {
             return View("ConfirmEmail", result.GeneralError);
         }
+
         return View("ConfirmEmail", "Tu cuenta ha sido activada correctamente. Ya puedes iniciar sesión");
     }
-
 }
