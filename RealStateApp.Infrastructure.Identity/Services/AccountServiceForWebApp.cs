@@ -1,7 +1,7 @@
-﻿using ArtemisBanking.Core.Application.Dtos.Login;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using RealStateApp.Core.Application;
+using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Infrastructure.Identity.Entities;

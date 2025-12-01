@@ -1,11 +1,11 @@
 ﻿using System.Text;
-using ArtemisBanking.Core.Application.Dtos.Login;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application;
 using RealStateApp.Core.Application.Dtos.Email;
+using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Domain.Common;

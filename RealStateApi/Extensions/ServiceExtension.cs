@@ -1,5 +1,5 @@
 ﻿using Asp.Versioning;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace RealStateApi.Extensions
 {
@@ -13,8 +13,8 @@ namespace RealStateApi.Extensions
                 // Revisa toda la documentacion del proyecto y lo pone en Swagger
                 List<string> xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml", searchOption: SearchOption.TopDirectoryOnly).ToList();
                 xmlFiles.ForEach(xmlFile => options.IncludeXmlComments(xmlFile));
-
-                options.SwaggerDoc("v1", new OpenApiInfo
+                
+                options.SwaggerDoc("v1", new OpenApiInfo()
                 {
                     Version = "v1.0",
                     Title = "RealStateApp API",
@@ -28,34 +28,20 @@ namespace RealStateApi.Extensions
 
 
                 options.DescribeAllParametersInCamelCase();
-
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                options.EnableAnnotations();
+                
+                options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
                 {
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
                     BearerFormat = "JWT",
-                    Description = "Input your Bearer token in this format 'Bearer { your token here }'"
+                    Description = "JWT Authorization header using the Bearer scheme."
                 });
-
-
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            },
-                            Scheme = "Bearer",
-                            Name = "Bearer",
-                            In = ParameterLocation.Header
-                        }, new List<string>()
-                    }
+                    [new OpenApiSecuritySchemeReference("bearer", document)] = []
                 });
+
             });        
         }
 

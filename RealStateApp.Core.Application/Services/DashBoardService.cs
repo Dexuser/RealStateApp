@@ -8,10 +8,10 @@ namespace RealStateApp.Core.Application.Services;
 
 public class DashBoardService : IDashBoardService
 {
-    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
+    private readonly IBaseAccountService _accountServiceForWebApp;
     private readonly IPropertyRepository _propertyRepository;
 
-    public DashBoardService(IAccountServiceForWebApp accountServiceForWebApp, IPropertyRepository propertyRepository)
+    public DashBoardService(IBaseAccountService accountServiceForWebApp, IPropertyRepository propertyRepository)
     {
         _accountServiceForWebApp = accountServiceForWebApp;
         _propertyRepository = propertyRepository;

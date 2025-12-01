@@ -37,6 +37,10 @@ public class ChatMessageController : Controller
         return View(model);
     }
 
+    /*
+     * Este metodo se puede usar desde las dos direcciones. Cliente -> Agente y Agente -> Cliente solo ordena el
+     * Sender y Reciver del modelo adecuadamente.
+     */
     [HttpPost]
     public async Task<IActionResult> SendMessage(ChatMessageViewModel messageViewModel)
     {

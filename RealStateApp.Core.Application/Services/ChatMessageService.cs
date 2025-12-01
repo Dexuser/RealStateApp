@@ -11,11 +11,11 @@ namespace RealStateApp.Core.Application.Services;
 public class ChatMessageService : GenericServices<ChatMessage, ChatMessageDto>, IChatMessageService
 {
     private readonly IChatMessageRepository _chatMessageRepository;
-    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
+    private readonly IBaseAccountService _accountServiceForWebApp;
     private readonly IMapper _mapper;
 
     public ChatMessageService(IChatMessageRepository repository, IMapper mapper,
-        IAccountServiceForWebApp accountServiceForWebApp) : base(repository, mapper)
+        IBaseAccountService accountServiceForWebApp) : base(repository, mapper)
     {
         _chatMessageRepository = repository;
         _mapper = mapper;

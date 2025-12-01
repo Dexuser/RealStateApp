@@ -1,5 +1,5 @@
-using ArtemisBanking.Core.Application.Dtos.Login;
 using AutoMapper;
+using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.ViewModels.Login;
 

@@ -6,9 +6,9 @@ namespace RealStateApp.Core.Application.Services;
 
 public class DeveloperService : IDeveloperService
 {
-    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
+    private readonly IBaseAccountService _accountServiceForWebApp;
 
-    public DeveloperService(IAccountServiceForWebApp accountServiceForWebApp)
+    public DeveloperService(IBaseAccountService accountServiceForWebApp)
     {
         _accountServiceForWebApp = accountServiceForWebApp;
     }

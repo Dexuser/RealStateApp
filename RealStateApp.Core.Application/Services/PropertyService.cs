@@ -13,13 +13,13 @@ namespace RealStateApp.Core.Application.Services;
 
 public class PropertyService : GenericServices<Property, PropertyDto>, IPropertyService
 {
-    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
+    private readonly IBaseAccountService _accountServiceForWebApp;
 
     private readonly IPropertyRepository _propertyRepository;
     private readonly IMapper _mapper;
 
     public PropertyService(IPropertyRepository repository, IMapper mapper,
-        IAccountServiceForWebApp accountServiceForWebApp) : base(repository, mapper)
+        IBaseAccountService accountServiceForWebApp) : base(repository, mapper)
     {
         _propertyRepository = repository;
         _mapper = mapper;
