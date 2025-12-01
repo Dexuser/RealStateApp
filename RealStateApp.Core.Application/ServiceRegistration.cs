@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
+using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RealStateApp.Core.Application.Behaviors;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Application.Services;
 using RealStateApp.Core.Domain.Interfaces;
@@ -12,7 +15,13 @@ namespace RealStateApp.Core.Application
         //Extension method - Decorator pattern
         public static void AddApplicationLayerIoc(this IServiceCollection services, IConfiguration config)
         {
+            // Configurations
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddMediatR(opt=> opt.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            
+            // Services
             services.AddScoped<IChatMessageService, ChatMessageService>();
             services.AddScoped<IFavoritePropertyService, FavoritePropertyService>();
             services.AddScoped<IImprovementService, ImprovementService>();

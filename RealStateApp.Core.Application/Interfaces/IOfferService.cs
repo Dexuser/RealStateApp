@@ -5,5 +5,5 @@ namespace RealStateApp.Core.Application.Interfaces;
 
 public interface IOfferService :  IGenericService<OfferDto>
 {
-    
+    Task<List<OfferDto>> GetAllOffersOfThisClientOnThisProperty(string clientId, int propertyId);
 }

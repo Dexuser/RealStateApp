@@ -1,0 +1,70 @@
+@using System.Security.Claims
+@model ChatMessageIndexViewModel
+
+@{
+    ViewData["Title"] = "Chat";
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+}
+
+<div class="container py-4">
+
+    <h3 class="mb-4">Chat de la propiedad @Model.PropertyCode</h3>
+
+    <div class="card shadow-sm">
+        
+        <!-- Área de historial -->
+        <div class="card-body overflow-auto" style="height: 450px; background: #f1f3f5;">
+            @if (Model == null || !Model.Messages.Any())
+            {
+                <p class="text-center text-muted mt-4">No hay mensajes aún.</p>
+            }
+            else
+            {
+                foreach (var msg in Model.Messages)
+                {
+                    bool isMine = msg.SenderId == currentUserId;
+
+                    <div class="d-flex mb-3 @(isMine ? "justify-content-end" : "justify-content-start")">
+                        <div class="p-3 rounded-3 
+                            @(isMine ? "bg-primary text-white" : "bg-light")
+                            " style="max-width: 75%;">
+                            
+                            <div class="fw-semibold small mb-1">
+                                @(isMine ? "Tú" : msg.Sender?.FirstName + " " + msg.Sender?.LastName)
+                            </div>
+
+                            <div>@msg.Message</div>
+
+                            <div class="text-end small text-muted mt-1">
+                                @msg.SentAt.ToString("g")
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Área para escribir y enviar mensaje -->
+        <div class="card-footer">
+            <form asp-action="SendMessage" asp-controller="ChatMessage" method="post">
+                <div class="input-group">
+                    <textarea 
+                        name="Message" 
+                        class="form-control" 
+                        rows="2" 
+                        placeholder="Escribe un mensaje..." 
+                        required></textarea>
+
+                    <input type="hidden" name="propertyId" value="@Model.PropertyId" />
+                    <input type="hidden" name="receiverId" value="@Model.ReceiverId" />
+                    <input type="hidden" name="senderId" value="@Model.SenderId" />
+
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

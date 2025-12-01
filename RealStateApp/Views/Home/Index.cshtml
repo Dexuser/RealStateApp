@@ -1,4 +1,5 @@
-﻿@model HomeIndexViewModel
+﻿@using RealStateApp.Core.Domain.Common
+@model HomeIndexViewModel
 
 @{
     ViewData["Title"] = "Listado de Propiedades";
@@ -14,6 +15,8 @@
 
                     <h5 class="mb-3">Filtros</h5>
                     <form asp-area="" asp-controller="Home" asp-action="Index" method="get">
+
+                        <input type="hidden" asp-for="Filters.OnlyFavorites" value="@Model.Filters.OnlyFavorites" />
 
                         <!-- Tipo de propiedad -->
                         <div class="mb-3">
@@ -97,47 +100,14 @@
                 {
                     @foreach (var prop in Model.Properties)
                     {
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card shadow-sm h-100">
-
-                                @{
-                                    var imagePath = prop.PropertyImages.Single().ImagePath; 
-                                }
-                                
-                                <img src="@imagePath"
-                                     class="card-img-top"
-                                     alt="Imagen de propiedad"
-                                     style="height: 180px; object-fit: cover;" />
-
-                                <div class="card-body">
-                                    <h5 class="card-title">Tipo: @prop.PropertyType!.Name</h5>
-                                    <p class="card-text text-muted mb-2">
-                                        Codigo: @prop.Code
-                                    </p>
-                                    <p class="card-text text-muted mb-2">
-                                        Tipo de venta: @prop.SaleType!.Name
-                                    </p>
-                                    <p class="fw-bold text-primary">
-                                        RD$ @prop.Price.ToString("N0")
-                                    </p>
-
-                                    <ul class="list-inline small">
-                                        <li class="list-inline-item"><i class="bi bi-door-open"></i> @prop.Rooms Hab.</li>
-                                        <li class="list-inline-item"><i class="bi bi-droplet"></i> @prop.Bathrooms Baños</li>
-                                        <li class="list-inline-item"><i class="bi bi-bounding-box-circles"></i> @prop.SizeInMeters mt</li>
-                                    </ul>
-
-                                </div>
-
-                                <div class="card-footer bg-white">
-                                    <a asp-action="Details" asp-route-id="@prop.Id"
-                                       class="btn btn-outline-primary w-100">
-                                        Ver Detalles
-                                    </a>
-                                </div>
-
-                            </div>
-                        </div>
+                        @if (User.IsInRole(nameof(Roles.Client)))
+                        {
+                            @await Html.PartialAsync("_PropertyCardClient", prop)
+                        }
+                        else
+                        {
+                            @await Html.PartialAsync("_PropertyCard", prop)
+                        }
                     }
                 }
 

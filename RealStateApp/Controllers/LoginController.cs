@@ -2,6 +2,7 @@ using ArtemisBanking.Core.Application.Dtos.Login;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Application.ViewModels.Login;
 using RealStateApp.Core.Domain.Common;
@@ -10,19 +11,27 @@ using RealStateApp.Infrastructure.Identity.Entities;
 
 namespace RealStateApp.Controllers;
 
-public class LoginController(
-    IMapper mapper,
-    IAccountServiceForWebApp accountServiceForWebApp,
-    UserManager<AppUser> userManager)
-    : Controller
+public class LoginController : Controller
 {
+    private readonly IMapper _mapper;
+    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
+    private readonly UserManager<AppUser> _userManager;
+
+    public LoginController(IMapper mapper, IAccountServiceForWebApp accountServiceForWebApp,
+        UserManager<AppUser> userManager)
+    {
+        _mapper = mapper;
+        _accountServiceForWebApp = accountServiceForWebApp;
+        _userManager = userManager;
+    }
+
     // GET
     public async Task<IActionResult> Index()
     {
-        var user = await userManager.GetUserAsync(User);
+        var user = await _userManager.GetUserAsync(User);
         if (user != null)
         {
-            var role =  await userManager.GetRolesAsync(user);
+            var role = await _userManager.GetRolesAsync(user);
             return await RedirectToHomeByRole(role[0]);
         }
         
@@ -34,16 +43,16 @@ public class LoginController(
     {
         if (!ModelState.IsValid)
         {
-            return View("Index",loginViewModel);
+            return View("Index", loginViewModel);
         }
-        
-        var loginDto = mapper.Map<LoginDto>(loginViewModel);
-        var result = await accountServiceForWebApp.AuthenticateAsync(loginDto);
-        
+
+        var loginDto = _mapper.Map<LoginDto>(loginViewModel);
+        var result = await _accountServiceForWebApp.AuthenticateAsync(loginDto);
+
         if (result.IsFailure)
         {
             this.SendValidationErrorMessages(result);
-            return View("Index",loginViewModel);
+            return View("Index", loginViewModel);
         }
 
         var user = result.Value!;
@@ -52,7 +61,7 @@ public class LoginController(
 
     public async Task<IActionResult> LogOut()
     {
-        await accountServiceForWebApp.SignOutAsync();
+        await _accountServiceForWebApp.SignOutAsync();
         return RedirectToRoute(new { controller = "Login", action = "Index" });
     }
 
@@ -69,9 +78,10 @@ public class LoginController(
         {
             return View(vm);
         }
-        var origin = Request.Headers?.Origin.ToString() ?? string.Empty;
-        ForgotPasswordRequestDto dto = new() { UserName = vm.UserName,Origin = origin};
-        var result = await accountServiceForWebApp.ForgotPasswordAsync(dto);
+
+        string origin = Request?.Headers?.Origin.ToString() ?? string.Empty;
+        ForgotPasswordRequestDto dto = new() { UserName = vm.UserName, Origin = origin };
+        var result = await _accountServiceForWebApp.ForgotPasswordAsync(dto);
 
         if (result.IsFailure)
         {
@@ -108,7 +118,7 @@ public class LoginController(
             Token = vm.Token
         };
 
-        var result = await accountServiceForWebApp.ResetPasswordAsync(dto);
+        var result = await _accountServiceForWebApp.ResetPasswordAsync(dto);
 
         if (result.IsFailure)
         {
@@ -123,7 +133,7 @@ public class LoginController(
 
     private async Task<IActionResult> RedirectToHomeByRole(string role)
     {
-        if (Enum.TryParse(role, out Roles userRole))
+        if (Roles.TryParse(role, out Roles userRole))
         {
             switch (userRole)
             {
@@ -137,8 +147,8 @@ public class LoginController(
                     return RedirectToRoute(new { area="Client" , controller = "Home", action = "Index" });
            }
         }
-        
-        await accountServiceForWebApp.SignOutAsync();
+
+        await _accountServiceForWebApp.SignOutAsync();
         ViewBag.Message = "Los usuarios de rol desarrollador solamente pueden acceder por la API";
         return View("Index", new LoginViewModel
         {
@@ -156,7 +166,7 @@ public class LoginController(
     
     public async Task<IActionResult> ConfirmEmail(string userId,string token)
     {
-        var result = await accountServiceForWebApp.ConfirmAccountAsync(userId, token);
+        var result = await _accountServiceForWebApp.ConfirmAccountAsync(userId, token);
         if (result.IsFailure)
         {
             return View("ConfirmEmail", result.GeneralError);

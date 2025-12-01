@@ -41,6 +41,7 @@ namespace RealStateApp.Infrastructure.Identity
 
                 opt.User.RequireUniqueEmail = true;
                 opt.SignIn.RequireConfirmedEmail = true;
+                
             });
 
             // Identity setup

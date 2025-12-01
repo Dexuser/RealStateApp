@@ -1,0 +1,115 @@
+@using RealStateApp.Core.Domain.Common
+@model RealStateApp.Core.Application.ViewModels.Offer.OfferListViewModel
+
+@{
+    ViewData["Title"] = "Mis Ofertas";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Mis Ofertas</h2>
+
+        <!-- Botón Nueva Oferta -->
+        <button class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#newOfferModal"
+                @(Model.CanCreateOffer ? "" : "disabled")>
+            <i class="bi bi-plus-circle"></i> Nueva Oferta
+        </button>
+    </div>
+
+    <!-- Si no hay ofertas -->
+    @if (!Model.Offers.Any())
+    {
+        <div class="alert alert-info">
+            No has realizado ofertas para esta propiedad.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var offer in Model.Offers)
+                {
+                    <tr>
+                        <td>@offer.CreatedAt.ToString("dd/MM/yyyy hh:mm tt")</td>
+                        <td><strong>$@offer.Amount</strong></td>
+                        <td>
+                            @switch (offer.Status)
+                            {
+                                case OfferStatus.Pending:
+                                    <span class="badge bg-warning text-dark">Pendiente</span>;
+                                    break;
+                                case OfferStatus.Accepted:
+                                    <span class="badge bg-success">Aceptada</span>;
+                                    break;
+                                case OfferStatus.Rejected:
+                                    <span class="badge bg-danger">Rechazada</span>;
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
+
+<!-- Modal Nueva Oferta -->
+<div class="modal fade" id="newOfferModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form asp-controller="Offer" asp-action="Create" method="post">
+
+                <input type="hidden" name="PropertyId" value="@Model.PropertyId" />
+                <input type="hidden" name="UserId" value="@Model.ClientId" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Realizar nueva oferta</h5>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Monto ofertado</label>
+                        <input type="number"
+                               name="Amount"
+                               class="form-control"
+                               min="1"
+                               placeholder="Ej: 150000"
+                               required />
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Cancelar</button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Enviar Oferta
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

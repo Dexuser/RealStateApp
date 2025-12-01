@@ -1,6 +1,5 @@
-﻿namespace InvestmentApi.Handlers
+﻿namespace RealStateApi.Handlers
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S125:Sections of code should not be commented out", Justification = "<Pending>")]
     public static class FileHandler
     {
         public static string? Upload(IFormFile? file, string id, string folderName, bool isEditMode = false, string? imagePath = "")

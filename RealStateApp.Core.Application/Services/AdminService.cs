@@ -1,4 +1,3 @@
-using ArtemisBanking.Core.Application.Dtos.Login;
 using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
@@ -9,9 +8,9 @@ namespace RealStateApp.Core.Application.Services;
 
 public class AdminService : IAdminService
 {
-    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
+    private readonly IBaseAccountService _accountServiceForWebApp;
 
-    public AdminService(IAccountServiceForWebApp accountServiceForWebApp)
+    public AdminService(IBaseAccountService accountServiceForWebApp)
     {
         _accountServiceForWebApp = accountServiceForWebApp;
     }

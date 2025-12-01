@@ -1,14 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ArtemisBanking.Core.Application.Dtos.Login;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RealStateApp.Core.Application;
+using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
+using RealStateApp.Core.Domain.Common;
 using RealStateApp.Core.Domain.Settings;
 using RealStateApp.Infrastructure.Identity.Entities;
 
@@ -61,6 +62,13 @@ namespace RealStateApp.Infrastructure.Identity.Services
                 }
                 
                 return Result<string>.Fail($"these credentials are invalid for this user: {user.UserName}");
+            }
+
+            // En este sistema un usuario solamente puede tener un rol
+            var role = (await _userManager.GetRolesAsync(user)).SingleOrDefault() ?? "";
+            if (role != nameof(Roles.Admin) && role != nameof(Roles.Developer))
+            {
+                return Result<string>.Fail("Only Administradors and developers can use this API");
             }
         
             string token = new JwtSecurityTokenHandler().WriteToken(await GenerateJwtToken(user));

@@ -29,6 +29,7 @@ public class PropertyDto
     public bool IsAvailable { get; set; } // true = available, false = sold
     public required DateTime CreatedAt { get; set; }
     public required string AgentId { get; set; }
+    public bool IsFavorite { get; set; }
 
     // Navigation
     public ICollection<PropertyImageDto> PropertyImages { get; set; } = [];

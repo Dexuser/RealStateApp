@@ -8,4 +8,5 @@ public class PropertyViewModelFilters
     public double? MaxValue { get; set; }
     public int?  Bathrooms { get; set; }
     public int?  Rooms { get; set; }
+    public bool OnlyFavorites { get; set; }
 }

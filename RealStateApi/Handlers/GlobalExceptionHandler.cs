@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
+﻿using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
 using RealStateApp.Core.Application.Exceptions;
 
-namespace InvestmentApi.Handlers
+namespace RealStateApi.Handlers
 {
     public class GlobalExceptionHandler : IExceptionHandler
     {
@@ -15,7 +14,9 @@ namespace InvestmentApi.Handlers
             switch (exception)
             {
                 case ApiException apiException:
+                {
                     //custom exception handling
+                    
                     switch (apiException.StatusCode)
                     {
                         case (int)HttpStatusCode.BadRequest:
@@ -34,14 +35,21 @@ namespace InvestmentApi.Handlers
                             break;
                     }
                     break;
+                }
+                
                 case KeyNotFoundException:
                     exceptionTitle = "Not found";
                     httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     break;
-                case ArgumentException or ValidationException://only available in .NET 9+
+                case ArgumentException:
                     exceptionTitle = "Bad Request";
                     httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    break;        
+                    break;
+                case ValidationException validationException:
+                    exceptionTitle = "Bad Request";
+                    details = validationException.Errors.Aggregate((a,b) => a + ", " + b);
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    break;
                 default:
                     httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     break;

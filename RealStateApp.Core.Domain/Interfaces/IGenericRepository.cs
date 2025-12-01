@@ -1,5 +1,6 @@
 namespace RealStateApp.Core.Domain.Interfaces;
 
+
 public interface IGenericRepository<TEntity> where TEntity : class
 {
     Task<TEntity?> GetByIdAsync(int id);

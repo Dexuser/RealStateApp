@@ -1,4 +1,4 @@
-using ArtemisBanking.Core.Application.Dtos.Login;
+using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Domain.Common;
 

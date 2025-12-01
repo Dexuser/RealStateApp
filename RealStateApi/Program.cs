@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
-using InvestmentApi.Handlers;
+using Microsoft.AspNetCore.Mvc;
 using RealStateApi.Extensions;
+using RealStateApi.Handlers;
 using RealStateApp.Core.Application;
 using RealStateApp.Infrastructure.Identity;
 using RealStateApp.Infrastructure.Persistence;
@@ -9,7 +10,18 @@ using RealStateApp.Infrastructure.Shared;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers().AddJsonOptions(opt =>
+
+
+builder.Services.AddControllers(opt =>
+    {
+        opt.Filters.Add(new ProducesAttribute("application/json"));
+    })
+    .ConfigureApiBehaviorOptions(opt =>
+    {
+        opt.SuppressInferBindingSourcesForParameters = true; // Tienes que poner [FromRoute] o [FromBody] obligado
+        opt.SuppressMapClientErrors = true;
+    })
+    .AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });;
@@ -21,7 +33,6 @@ builder.Services.AddPersistenceLayerIoc(builder.Configuration);
 builder.Services.AddIdentityLayerIocForWebApi(builder.Configuration);
 builder.Services.AddSharedLayerIoc(builder.Configuration);
 
-builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer(); // Ayuda configurar metada para documentacion (para swagger en realidad)
 builder.Services.AddHealthChecks(); // Diagnostica el estado de salud
 // esto construye swagger
@@ -52,7 +63,6 @@ await app.Services.RunIdentitySeedAsync();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerExtension(app);
-    app.MapOpenApi();
     app.UseCors("AllowAll");
 }
 

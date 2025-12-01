@@ -1,4 +1,4 @@
-﻿namespace ArtemisBanking.Core.Application.Dtos.Login
+﻿namespace RealStateApp.Core.Application.Dtos.Login
 {
     public class ForgotPasswordRequestDto
     {

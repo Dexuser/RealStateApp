@@ -1,3 +1,5 @@
+@using System.Security.Claims
+@using RealStateApp.Core.Domain.Common
 @model RealStateApp.Core.Application.ViewModels.Property.PropertyViewModel
 
 @{
@@ -6,9 +8,7 @@
 
 <div class="container py-4">
 
-    <!-- ===================================== -->
-    <!--            SLIDER IMÁGENES            -->
-    <!-- ===================================== -->
+
     <div class="row mb-4">
         <div class="col-12">
             <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -47,17 +47,12 @@
         </div>
     </div>
 
-    <!-- ===================================== -->
-    <!--     CONTENIDO PRINCIPAL + AGENTE      -->
-    <!-- ===================================== -->
     <div class="row">
 
-        <!-- ===================================== -->
-        <!--          COLUMNA IZQUIERDA            -->
-        <!-- ===================================== -->
+        @* columna izquierda *@
         <div class="col-md-8">
 
-            <!-- ======== DESCRIPCIÓN ======== -->
+            @* descripcion  *@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h4 class="mb-3">Descripción</h4>
@@ -65,7 +60,7 @@
                 </div>
             </div>
 
-            <!-- ======== CARACTERÍSTICAS ======== -->
+            @* caracteristicas *@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h4 class="mb-3">Características</h4>
@@ -131,32 +126,35 @@
                     </div>
                 </div>
             </div>
-            <!-- ======== MEJORAS ======== -->
+            
+            @* mejoras *@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h4 class="mb-3">Mejoras de la Propiedad</h4>
 
                     <div class="d-flex flex-wrap gap-2">
 
-                        @foreach (var improvement in Model.PropertyImprovements)
+                        @if (@Model.PropertyImprovements.Count == 0)
                         {
-                            <span class="badge bg-light text-dark border rounded-1 px-3 py-2 d-flex align-items-center" style="font-size: 0.95rem;">
-                                <i class="bi bi-check2-circle text-success me-2 fs-5"></i>
-                                @improvement.Improvement!.Name
-                            </span>
+                            <div class="text-center text-muted">Esta propiedad no tiene mejoras</div>
                         }
-
+                        else
+                        {
+                            @foreach (var improvement in Model.PropertyImprovements)
+                            {
+                                <span class="badge bg-light text-dark border rounded-1 px-3 py-2 d-flex align-items-center" style="font-size: 0.95rem;">
+                                    <i class="bi bi-check2-circle text-success me-2 fs-5"></i>
+                                    @improvement.Improvement!.Name
+                                </span>
+                            }
+                           
+                        }
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- ===================================== -->
-        <!--        COLUMNA DERECHA (AGENTE)       -->
-        <!-- ===================================== -->
         <div class="col-md-4">
-
             <div class="card shadow-sm mb-4">
                 <div class="card-body text-center">
 
@@ -167,31 +165,42 @@
                         <img src="@Model.Agent.ProfileImagePath"
                              class="rounded-circle mb-3"
                              style="width: 120px; height: 120px; object-fit: cover;"/>
-
                         <h5 class="fw-bold">@Model.Agent.FirstName @Model.Agent.LastName</h5>
                         <p class="text-muted">@Model.Agent.Email</p>
+                        <p class="text-muted">@Model.Agent.PhoneNumber</p>
 
-                        <hr/>
-
-                        <p><i class="bi bi-telephone"></i> @Model.Agent.PhoneNumber</p>
-
-                        <a href="https://wa.me/@Model.Agent.PhoneNumber" target="_blank"
-                           class="btn btn-success w-100 mb-2">
-                            <i class="bi bi-whatsapp"></i> WhatsApp
-                        </a>
-
-                        <a href="mailto:@Model.Agent.Email" class="btn btn-primary w-100">
-                            <i class="bi bi-envelope"></i> Enviar Email
-                        </a>
+                        if (User.IsInRole(nameof(Roles.Client)))
+                        {
+                            var currentClientId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+                            <hr/>
+                            <div class="mb-2">
+                                <a asp-controller="ChatMessage" 
+                                   asp-action="Index" 
+                                   asp-route-propertyId="@Model.Id"
+                                   asp-route-agentId="@Model.AgentId"
+                                   asp-route-clientId="@currentClientId"
+                                   asp-route-propertyCode="@Model.Code"
+                                   class="btn btn-primary w-100">
+                                    <i class="bi bi-chat-dots"></i> Enviar mensaje
+                                </a>
+                            </div>
+                            <div>
+                                <a asp-controller="Offer" 
+                                   asp-route-propertyId="@Model.Id"
+                                   asp-route-clientId="@currentClientId"
+                                   asp-action="Index"
+                                   class="btn btn-secondary w-100">
+                                    Ver mis ofertas
+                                </a>
+                            </div>
+                       }
                     }
                     else
                     {
                         <p class="text-muted">No se encontró información del agente.</p>
                     }
-
                 </div>
             </div>
-
         </div>
 
     </div>

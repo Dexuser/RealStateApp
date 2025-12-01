@@ -9,10 +9,10 @@ namespace RealStateApp.Core.Application.Services;
 
 public class AgentService : IAgentService
 {
-    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
+    private readonly IBaseAccountService _accountServiceForWebApp;
     private readonly IPropertyRepository _propertyRepository;
 
-    public AgentService(IAccountServiceForWebApp accountServiceForWebApp, IPropertyRepository propertyRepository)
+    public AgentService(IBaseAccountService accountServiceForWebApp, IPropertyRepository propertyRepository)
     {
         _accountServiceForWebApp = accountServiceForWebApp;
         _propertyRepository = propertyRepository;
