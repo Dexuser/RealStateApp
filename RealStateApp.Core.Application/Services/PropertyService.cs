@@ -46,91 +46,118 @@ public class PropertyService : GenericServices<Property, PropertyDto>, IProperty
         return property;
     }
 
-public async Task<List<PropertyDto>> GetAllAvailablePropertiesAsync(PropertyFiltersDto filtersDto)
-{
-    var query = _propertyRepository
-        .GetAllQueryable()
-        .AsNoTracking()
-        .AsSplitQuery() // para evitar una consulta grandisima
-        .Where(p => p.IsAvailable);
-
-    if (!string.IsNullOrEmpty(filtersDto.AgentId))
-        query = query.Where(p => p.AgentId == filtersDto.AgentId);
-
-    if (filtersDto.SelectedPropertyTypeId.HasValue)
-        query = query.Where(p => p.PropertyTypeId == filtersDto.SelectedPropertyTypeId);
-
-    if (filtersDto.MinValue.HasValue)
-        query = query.Where(p => p.Price >= (decimal)filtersDto.MinValue.Value);
-
-    if (filtersDto.MaxValue.HasValue)
-        query = query.Where(p => p.Price <= (decimal)filtersDto.MaxValue.Value);
-
-    if (filtersDto.Bathrooms.HasValue)
-        query = query.Where(p => p.Bathrooms >= filtersDto.Bathrooms.Value);
-
-    if (filtersDto.Rooms.HasValue)
-        query = query.Where(p => p.Rooms >= filtersDto.Rooms.Value);
-
-    if (filtersDto.OnlyFavorites)
+    public async Task<List<PropertyDto>> GetAllAvailablePropertiesAsync(PropertyFiltersDto filtersDto)
     {
-        query = query.Where(p =>
-            p.FavoriteProperties.Any(fp => fp.UserId == filtersDto.ClientId));
+        var query = _propertyRepository
+            .GetAllQueryable()
+            .AsNoTracking()
+            .AsSplitQuery() // para evitar una consulta grandisima
+            .Where(p => p.IsAvailable);
+
+        if (!string.IsNullOrEmpty(filtersDto.AgentId))
+            query = query.Where(p => p.AgentId == filtersDto.AgentId);
+
+        if (filtersDto.SelectedPropertyTypeId.HasValue)
+            query = query.Where(p => p.PropertyTypeId == filtersDto.SelectedPropertyTypeId);
+
+        if (filtersDto.MinValue.HasValue)
+            query = query.Where(p => p.Price >= (decimal)filtersDto.MinValue.Value);
+
+        if (filtersDto.MaxValue.HasValue)
+            query = query.Where(p => p.Price <= (decimal)filtersDto.MaxValue.Value);
+
+        if (filtersDto.Bathrooms.HasValue)
+            query = query.Where(p => p.Bathrooms >= filtersDto.Bathrooms.Value);
+
+        if (filtersDto.Rooms.HasValue)
+            query = query.Where(p => p.Rooms >= filtersDto.Rooms.Value);
+
+        if (filtersDto.OnlyFavorites)
+        {
+            query = query.Where(p =>
+                p.FavoriteProperties.Any(fp => fp.UserId == filtersDto.ClientId));
+        }
+
+        query = query
+            .Include(p => p.PropertyType)
+            .Include(p => p.SaleType)
+            .Include(p => p.PropertyImages);
+
+        var result = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => new PropertyDto
+            {
+                Id = p.Id,
+                Code = p.Code,
+                PropertyTypeId = p.PropertyTypeId,
+                SaleTypeId = p.SaleTypeId,
+                Price = p.Price,
+                SizeInMeters = p.SizeInMeters,
+                Rooms = p.Rooms,
+                Bathrooms = p.Bathrooms,
+                Description = p.Description,
+                CreatedAt = p.CreatedAt,
+                AgentId = p.AgentId,
+                IsAvailable = p.IsAvailable,
+
+                PropertyType = new PropertyTypeDto
+                {
+                    Id = p.PropertyType.Id,
+                    Name = p.PropertyType.Name,
+                    Description = p.PropertyType.Description,
+                },
+
+                SaleType = new SaleTypeDto
+                {
+                    Id = p.SaleType.Id,
+                    Name = p.SaleType.Name,
+                    Description = p.SaleType.Description,
+                },
+
+                PropertyImages = p.PropertyImages
+                    .Where(pi => pi.IsMain)
+                    .Select(pi => new PropertyImageDto
+                    {
+                        Id = pi.Id,
+                        ImagePath = pi.ImagePath,
+                        PropertyId = pi.PropertyId,
+                        IsMain = pi.IsMain,
+                    })
+                    .ToList(),
+
+                IsFavorite = p.FavoriteProperties
+                    .Any(fp => fp.UserId == filtersDto.ClientId)
+            })
+            .ToListAsync();
+
+        return result;
     }
 
-    query = query
-        .Include(p => p.PropertyType)
-        .Include(p => p.SaleType)
-        .Include(p => p.PropertyImages);
-
-    var result = await query
-        .OrderByDescending(p => p.CreatedAt)
-        .Select(p => new PropertyDto
+    public async Task<Result<List<PropertyDto>>> GetAllByAgentIdAsync(string agentId)
+    {
+        try
         {
-            Id = p.Id,
-            Code = p.Code,
-            PropertyTypeId = p.PropertyTypeId,
-            SaleTypeId = p.SaleTypeId,
-            Price = p.Price,
-            SizeInMeters = p.SizeInMeters,
-            Rooms = p.Rooms,
-            Bathrooms = p.Bathrooms,
-            Description = p.Description,
-            CreatedAt = p.CreatedAt,
-            AgentId = p.AgentId,
-            IsAvailable = p.IsAvailable,
+            var properties = await _propertyRepository
+                .GetAllQueryable()
+                .Where(x => x.AgentId == agentId)
+                .Include(x => x.PropertyType)
+                .Include(x => x.SaleType)
+                .Include(x => x.PropertyImages)
+                .Include(x => x.PropertyImprovements)
+                .ThenInclude(pm => pm.Improvement)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
 
-            PropertyType = new PropertyTypeDto
-            {
-                Id = p.PropertyType.Id,
-                Name = p.PropertyType.Name,
-                Description = p.PropertyType.Description,
-            },
+            if (!properties.Any())
+                return Result<List<PropertyDto>>.Fail("El Agente no tiene propiedades a su nombre");
 
-            SaleType = new SaleTypeDto
-            {
-                Id = p.SaleType.Id,
-                Name = p.SaleType.Name,
-                Description = p.SaleType.Description,
-            },
+            var dto = _mapper.Map<List<PropertyDto>>(properties);
 
-            PropertyImages = p.PropertyImages
-                .Where(pi => pi.IsMain)
-                .Select(pi => new PropertyImageDto
-                {
-                    Id = pi.Id,
-                    ImagePath = pi.ImagePath,
-                    PropertyId = pi.PropertyId,
-                    IsMain = pi.IsMain,
-                })
-                .ToList(),
-
-            IsFavorite = p.FavoriteProperties
-                .Any(fp => fp.UserId == filtersDto.ClientId)
-        })
-        .ToListAsync();
-
-    return result;
-}
-
+            return Result<List<PropertyDto>>.Ok(dto);
+        }
+        catch (Exception ex)
+        {
+           return Result<List<PropertyDto>>.Fail($"Error: {ex.Message}");
+        }
+    }
 }
