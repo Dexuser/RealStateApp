@@ -65,8 +65,20 @@ public class AgentPropertyController(
         }
         var agentId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var result = await _propertyService.CreatePropertyAsync(vm, agentId);
+        var result = await _propertyService.CreatePropertyAsync(vm, agentId!);
+        
+        if (result.IsFailure)
+        {
+            var msg = result.GeneralError ?? string.Join("; ", result.Errors!);
+            return Problem(msg);
+        }
+        return RedirectToAction("Index");
+    }
 
-        return null;
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        //var result = await _propertyService.EditPropertyAsync()
+        throw new Exception("Not Implemented");
     }
 }
