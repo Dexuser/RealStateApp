@@ -2,7 +2,7 @@ namespace RealStateApp.Core.Domain.Entities;
 
 public class PropertyImprovement
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required int PropertyId { get; set; }
     public Property? Property { get; set; }
 

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.PropertyType;
 using RealStateApp.Core.Application.Interfaces;
@@ -33,6 +34,18 @@ public class PropertyTypeService :  GenericServices<PropertyType, PropertyTypeDt
             .ToListAsync();
         
         return propertyTypes;
+    }
+
+    public async Task<List<SelectListItem>> GetSelectListAsync()
+    {
+        var type = await _propertyTypeRepository.GetAllAsync();
+
+        return type
+            .Select(t => new SelectListItem
+            {
+                Value = t.Id.ToString(),
+                Text = t.Name
+            }).ToList();
     }
 
     public override async Task<Result> DeleteAsync(int id)
