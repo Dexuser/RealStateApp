@@ -45,7 +45,9 @@ public class PropertyService : GenericServices<Property, PropertyDto>, IProperty
 
         return property;
     }
-
+// Solo propiedaes dispnibles.
+// propiedades en un rango de precio.
+// propiedades favoritas del usuario.
 public async Task<List<PropertyDto>> GetAllAvailablePropertiesAsync(PropertyFiltersDto filtersDto)
 {
     var query = _propertyRepository

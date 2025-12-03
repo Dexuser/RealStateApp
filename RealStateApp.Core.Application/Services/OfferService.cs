@@ -18,11 +18,18 @@ public class OfferService : GenericServices<Offer, OfferDto> , IOfferService
         _offerRepository = repository;
     }
 
-    public override Task<Result<OfferDto>> AddAsync(OfferDto dtoModel)
+    public override async Task<Result<OfferDto>> AddAsync(OfferDto dtoModel)
     {
-        dtoModel.CreatedAt = DateTime.UtcNow;
-        dtoModel.Status = OfferStatus.Pending;
-        return base.AddAsync(dtoModel);
+        try
+        {
+            dtoModel.CreatedAt = DateTime.UtcNow;
+            dtoModel.Status = OfferStatus.Pending;
+            return await base.AddAsync(dtoModel);
+        }
+        catch (Exception ex)
+        {
+            return Result<OfferDto>.Fail(ex.Message);
+        }
     }
 
     public async Task<List<OfferDto>> GetAllOffersOfThisClientOnThisProperty(string clientId, int propertyId)

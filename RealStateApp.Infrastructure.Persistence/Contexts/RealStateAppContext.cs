@@ -21,13 +21,15 @@ public class RealStateAppContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.HasSequence<long>("SeqPropertyCode")
-            .StartsAt(1)
-            .IncrementsBy(1)
-            .HasMax(999999)
-            .IsCyclic(false);
-
+        if (Database.IsSqlServer()) // esto es simplemente para que los tests que usan SQLite en memoria funcionen;
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.HasSequence<long>("SeqPropertyCode")
+                .StartsAt(1)
+                .IncrementsBy(1)
+                .HasMax(999999)
+                .IsCyclic(false);
+        }
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }
