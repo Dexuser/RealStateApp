@@ -1,4 +1,4 @@
-using System.Net.Mime;
+
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -31,9 +31,10 @@ public class PropertyService(
 {
     private readonly IMapper _mapper = mapper;
 
+    
     public override async Task<PropertyDto?> GetByIdAsync(int id)
     {
-        var property = await propertyRepository.GetAllQueryable().AsNoTracking()
+        var property = await propertyRepository.GetAllQueryable()
             .AsNoTracking()
             .AsSplitQuery()
             .Include(p => p.PropertyType)
@@ -50,13 +51,13 @@ public class PropertyService(
 
         return property;
     }
-
+    
     public async Task<List<PropertyDto>> GetAllAvailablePropertiesAsync(PropertyFiltersDto filtersDto)
     {
         var query = propertyRepository
             .GetAllQueryable()
             .AsNoTracking()
-            .AsSplitQuery() // para evitar una consulta grandisima
+            .AsSplitQuery()
             .Where(p => p.IsAvailable);
 
         if (!string.IsNullOrEmpty(filtersDto.AgentId))
@@ -138,6 +139,7 @@ public class PropertyService(
         return result;
     }
 
+   
     public async Task<Result<List<PropertyDto>>> GetAllByAgentIdAsync(string agentId)
     {
         try
@@ -165,7 +167,7 @@ public class PropertyService(
             return Result<List<PropertyDto>>.Fail($"Error: {ex.Message}");
         }
     }
-
+    
     public async Task<Result<List<PropertyDto>>> GetPropertiesForMaintenanceAsync(string agentId)
     {
         try
@@ -227,7 +229,9 @@ public class PropertyService(
                             Name = pm.Improvement.Name,
                             Description = pm.Improvement.Description
                         }).ToList()
-                }).ToListAsync();
+                })
+                .ToListAsync();
+
             if (!properties.Any())
                 return Result<List<PropertyDto>>.Fail("No tienes propiedades disponibles registradas.");
 
@@ -239,6 +243,10 @@ public class PropertyService(
         }
     }
 
+
+    // ===========================================================
+    // CREATE PROPERTY
+    // ===========================================================
     public async Task<Result<int>> CreatePropertyAsync(PropertyCreateViewModel vm, string agentId)
     {
         try
@@ -261,7 +269,7 @@ public class PropertyService(
 
             await propertyRepository.AddAsync(property);
 
-
+            // MAIN IMAGE
             if (vm.MainImage != null)
             {
                 string imagePath = FileHandler.Upload(vm.MainImage, property.Id.ToString(), "properties")!;
@@ -276,7 +284,7 @@ public class PropertyService(
                 await imageRepository.AddAsync(mainImage);
             }
 
-
+            // ADDITIONAL IMAGES
             if (vm.AdditionalImages != null)
             {
                 foreach (var img in vm.AdditionalImages)
@@ -294,7 +302,7 @@ public class PropertyService(
                 }
             }
 
-
+            // IMPROVEMENTS
             if (vm.SelectedImprovements.Any())
             {
                 foreach (var improvementId in vm.SelectedImprovements)
@@ -315,6 +323,10 @@ public class PropertyService(
         }
     }
 
+
+    // ===========================================================
+    // GET BY ID FOR EDIT
+    // ===========================================================
     public async Task<Result<PropertyEditViewModel>> GetByIdForEditAsync(int id)
     {
         try
@@ -328,7 +340,6 @@ public class PropertyService(
             if (property == null)
                 return Result<PropertyEditViewModel>.Fail("Propiedad no encontrada.");
 
-            // Map basic fields
             var vm = new PropertyEditViewModel
             {
                 Id = property.Id,
@@ -351,23 +362,17 @@ public class PropertyService(
 
                 SelectedImprovements = property.PropertyImprovements
                     .Select(x => x.ImprovementId)
+                    .ToList(),
+                PropertyTypes = (await propertyTypeRepository.GetAllAsync())
+                    .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
+                    .ToList(),
+                SaleTypes = (await saleTypeRepository.GetAllAsync())
+                    .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name })
+                    .ToList(),
+                Improvements = (await improvementRepository.GetAllAsync())
+                    .Select(m => new SelectListItem { Value = m.Id.ToString(), Text = m.Name })
                     .ToList()
             };
-
-            var types = await propertyTypeRepository.GetAllAsync();
-            vm.PropertyTypes = types
-                .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
-                .ToList();
-
-            var sales = await saleTypeRepository.GetAllAsync();
-            vm.SaleTypes = sales
-                .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name })
-                .ToList();
-
-            var improvements = await improvementRepository.GetAllAsync();
-            vm.Improvements = improvements
-                .Select(m => new SelectListItem { Value = m.Id.ToString(), Text = m.Name })
-                .ToList();
 
             return Result<PropertyEditViewModel>.Ok(vm);
         }
@@ -376,7 +381,7 @@ public class PropertyService(
             return Result<PropertyEditViewModel>.Fail($"Error al cargar la propiedad: {ex.Message}");
         }
     }
-
+    
     public async Task<Result<bool>> EditPropertyAsync(PropertyEditViewModel vm)
     {
         try
@@ -390,6 +395,7 @@ public class PropertyService(
             if (property == null)
                 return Result<bool>.Fail("Propiedad no encontrada.");
 
+            // Actualiza la informacion basica 
             property.Code = vm.Code;
             property.PropertyTypeId = vm.PropertyTypeId;
             property.SaleTypeId = vm.SaleTypeId;
@@ -401,78 +407,66 @@ public class PropertyService(
 
             await propertyRepository.UpdateAsync(property.Id, property);
 
-            if (vm.ImagesToDelete.Count != 0)
+            // DELETE IMAGES
+            if (vm.ImagesToDelete.Any())
             {
                 foreach (var imgId in vm.ImagesToDelete)
                 {
                     var imgEntity = property.PropertyImages.FirstOrDefault(i => i.Id == imgId);
                     if (imgEntity != null)
                     {
-                        // Borrar archivo físico
                         FileHandler.DeleteFile(imgEntity.ImagePath);
-
-                        // Borrar registro
-                      //  await imageRepository.DeleteAsync(imgEntity);
+                        await imageRepository.DeleteAsync(imgEntity.Id);
                     }
                 }
             }
 
+            // NEW MAIN IMAGE
             if (vm.NewMainImage != null)
             {
-                // Buscar la imagen principal actual (puede ser null)
                 var oldMain = property.PropertyImages.FirstOrDefault(i => i.IsMain);
+                string oldMainPath = oldMain?.ImagePath ?? "";
 
-                // Si existe oldMain, pasar su path para que FileHandler la elimine cuando subamos la nueva
-                string oldMainPath = oldMain?.ImagePath ?? string.Empty;
-
-                // Subir nueva imagen principal (isEditMode = true para que FileHandler elimine la vieja)
                 var newMainPath = FileHandler.Upload(vm.NewMainImage, property.Id.ToString(), "properties", true,
                     oldMainPath);
 
-                // Desmarcar el oldMain en BD si existe
                 if (oldMain != null)
                 {
                     oldMain.IsMain = false;
                     await imageRepository.UpdateAsync(oldMain.Id, oldMain);
                 }
 
-                // Agregar la nueva imagen como main
-                var mainImgEntity = new PropertyImage
+                await imageRepository.AddAsync(new PropertyImage
                 {
                     PropertyId = property.Id,
                     ImagePath = newMainPath!,
                     IsMain = true
-                };
-
-                await imageRepository.AddAsync(mainImgEntity);
+                });
             }
 
-            // 5) Nuevas imágenes adicionales
+            // NEW ADDITIONAL IMAGES
             if (vm.NewAdditionalImages != null && vm.NewAdditionalImages.Any())
             {
                 foreach (var file in vm.NewAdditionalImages)
                 {
                     var path = FileHandler.Upload(file, property.Id.ToString(), "properties");
 
-                    var imgEntity = new PropertyImage
+                    await imageRepository.AddAsync(new PropertyImage
                     {
                         PropertyId = property.Id,
-                        ImagePath = path,
+                        ImagePath = path!,
                         IsMain = false
-                    };
-
-                    await imageRepository.AddAsync(imgEntity);
+                    });
                 }
             }
 
-            // Asegurar que exista una imagen principal si hay imágenes
+            // ENSURE MAIN IMAGE EXISTS
             var anyMain = imageRepository
-                    .GetAllQueryable()
-                    .FirstOrDefault(i => i.PropertyId == property.Id && i.IsMain);
+                .GetAllQueryable()
+                .FirstOrDefault(i => i.PropertyId == property.Id && i.IsMain);
 
             if (anyMain == null)
             {
-                // Buscar primera imagen existente
                 var firstImg = imageRepository
                     .GetAllQueryable()
                     .FirstOrDefault(i => i.PropertyId == property.Id);
@@ -484,25 +478,24 @@ public class PropertyService(
                 }
             }
 
-            // 7) Actualizar mejoras: eliminar las previas y crear las nuevas
-            // Borrar las relaciones anteriores
-            await propertyImprovementRepository.DeleteAsync(property.Id);
+            // DELETE OLD IMPROVEMENTS
+            var oldImprovements = await propertyImprovementRepository
+                .GetAllQueryable()
+                .Where(pi => pi.PropertyId == property.Id)
+                .ToListAsync();
 
-            // Insertar las actuales seleccionadas
-            if (vm.SelectedImprovements.Count != 0)
+            foreach (var old in oldImprovements)
+                await propertyImprovementRepository.DeleteAsync(old.Id);
+
+            // ADD NEW IMPROVEMENTS
+            foreach (var impId in vm.SelectedImprovements)
             {
-                foreach (var impId in vm.SelectedImprovements)
+                await propertyImprovementRepository.AddAsync(new PropertyImprovement
                 {
-                    var newPi = new PropertyImprovement
-                    {
-                        PropertyId = property.Id,
-                        ImprovementId = impId
-                    };
-                    await propertyImprovementRepository.AddAsync(newPi);
-                }
+                    PropertyId = property.Id,
+                    ImprovementId = impId
+                });
             }
-
-            // 8) Fin — devolver éxito
             return Result<bool>.Ok(true);
         }
         catch (Exception ex)
@@ -510,5 +503,84 @@ public class PropertyService(
             return Result<bool>.Fail($"Error actualizando la propiedad: {ex.Message}");
         }
     }
-}
 
+    public async Task<Result<PropertyDeleteViewModel>> GetByIdForDeleteAsync(int id)
+    {
+        try
+        {
+            var property = await propertyRepository
+                .GetAllQueryable()
+                .AsNoTracking()
+                .Include(p => p.PropertyType)
+                .Include(p => p.SaleType)
+                .Include(p => p.PropertyImages)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (property == null)
+                return Result<PropertyDeleteViewModel>.Fail("Propiedad no encontrada.");
+
+            var vm = new PropertyDeleteViewModel
+            {
+                Id = property.Id,
+                Code = property.Code,
+                Price = property.Price,
+                SizeInMeters = property.SizeInMeters,
+                Rooms = property.Rooms,
+                Bathrooms = property.Bathrooms,
+                CreatedAt = property.CreatedAt,
+
+                PropertyTypeId = property.PropertyTypeId,
+                PropertyTypeName = property.PropertyType?.Name ?? string.Empty,
+
+                SaleTypeId = property.SaleTypeId,
+                SaleTypeName = property.SaleType?.Name ?? string.Empty,
+
+                MainImageUrl = property.PropertyImages
+                    .FirstOrDefault(i => i.IsMain)?.ImagePath
+            };
+
+            return Result<PropertyDeleteViewModel>.Ok(vm);
+        }
+        catch (Exception ex)
+        {
+            return Result<PropertyDeleteViewModel>.Fail($"Error cargando propiedad: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<bool>> DeletePropertyAsync(int id)
+    {
+        try
+        {
+            var property = await propertyRepository
+                .GetAllQueryable()
+                .Include(p => p.PropertyImages)
+                .Include(p => p.PropertyImprovements)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (property == null)
+                return Result<bool>.Fail("Propiedad no encontrada.");
+
+            // 1) Eliminar archivos físicos
+            foreach (var img in property.PropertyImages)
+            {
+                FileHandler.DeleteFile(img.ImagePath);
+                await imageRepository.DeleteAsync(img.Id);
+            }
+
+            FileHandler.Delete(property.Id.ToString(), "properties");
+
+            // 2) Eliminar mejoras
+            foreach (var imp in property.PropertyImprovements)
+                await propertyImprovementRepository.DeleteAsync(imp.Id);
+
+            // 3) Eliminar propiedad
+            await propertyRepository.DeleteAsync(property.Id);
+
+            return Result<bool>.Ok(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Fail($"Error eliminando propiedad: {ex.Message}");
+        }
+    }
+}

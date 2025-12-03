@@ -13,4 +13,6 @@ public interface IPropertyService : IGenericService<PropertyDto>
     Task<Result<int>> CreatePropertyAsync(PropertyCreateViewModel vm, string agentId);
     Task<Result<PropertyEditViewModel>> GetByIdForEditAsync(int id);
     Task<Result<bool>> EditPropertyAsync(PropertyEditViewModel vm);
+    Task<Result<PropertyDeleteViewModel>> GetByIdForDeleteAsync(int id);
+    Task<Result<bool>> DeletePropertyAsync(int id);
 }

@@ -1,13 +1,15 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RealStateApp.Core.Application.Dtos.Property;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Application.ViewModels.Property;
 using RealStateApp.Core.Application.ViewModels.Property.Actions;
+using RealStateApp.Core.Domain.Common;
 
 namespace RealStateApp.Areas.Agent.Controllers;
-
+[Area("Agent")]
+[Authorize(Roles = $"{nameof(Roles.Agent)}")] // Recuerda leer el apartado de seguridad de los requerimientos
 public class AgentPropertyController(
     IPropertyService propertyService,
     IPropertyImprovementService propertyImprovementService,
@@ -78,7 +80,68 @@ public class AgentPropertyController(
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        //var result = await _propertyService.EditPropertyAsync()
-        throw new Exception("Not Implemented");
+        var result = await _propertyService.GetByIdForEditAsync(id);
+        
+        if (result.IsFailure)
+        {
+            var msg = result.GeneralError ?? string.Join("; ", result.Errors!);
+            return Problem(msg);
+        }
+        
+        var vm = _mapper.Map<PropertyEditViewModel>(result.Value);
+
+        vm.PropertyTypes = await _propertyTypeService.GetSelectListAsync();
+        vm.SaleTypes = await _saleTypeService.GetSelectListAsync();
+        vm.Improvements  = await _propertyImprovementService.GetSelectListAsync();
+        
+        return View(vm);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(PropertyEditViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            vm.PropertyTypes = await _propertyTypeService.GetSelectListAsync();
+            vm.SaleTypes = await _saleTypeService.GetSelectListAsync();
+            vm.Improvements = await _propertyImprovementService.GetSelectListAsync();
+            return View(vm);
+        }
+
+        var result = await _propertyService.EditPropertyAsync(vm);
+       
+        if (result.IsFailure)
+        {
+            var msg = result.GeneralError ?? string.Join("; ", result.Errors!);
+            return Problem(msg);
+        }
+        return RedirectToAction("Index");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await _propertyService.GetByIdForDeleteAsync(id);
+        if (result.IsFailure)
+        {
+            var msg = result.GeneralError ?? string.Join("; ", result.Errors!);
+            return Problem(msg);
+        }
+        var vm = _mapper.Map<PropertyDeleteViewModel>(result.Value);
+        return View(vm);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var result = await _propertyService.DeletePropertyAsync(id);
+        
+        if (result.IsFailure)
+        {
+            var msg = result.GeneralError ?? string.Join("; ", result.Errors!);
+            return Problem(msg);
+        }
+        
+        return RedirectToAction("Index");
     }
 }
