@@ -1,4 +1,6 @@
-﻿namespace RealStateApp.Handlers;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace RealStateApp.Core.Application.Handler;
 
 public static class FileHandler
 {

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using RealStateApp.Core.Application.Dtos.PropertyType;
 using RealStateApp.Core.Application.ViewModels.PropertyType;
 
@@ -7,4 +8,5 @@ public interface IPropertyTypeService :  IGenericService<PropertyTypeDto>
 {
  
     public Task<List<PropertyTypeWithCountViewModel>> GetAllPropertyTypesWithCount();
+    Task<List<SelectListItem>> GetSelectListAsync();
 }

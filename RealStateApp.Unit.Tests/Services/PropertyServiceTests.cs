@@ -33,13 +33,19 @@ public class PropertyServiceTests
         _mapper = config.CreateMapper();
     }
 
-  private PropertyService CreateService()
+    private PropertyService CreateService()
     {
         var context = new RealStateAppContext(_dbOptions);
         var accountMock = new Mock<IBaseAccountService>();
-        var repo = new PropertyRepository(context);
+        var propertyImageRepository = new PropertyImageRepository(context);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var saleTypeRepository = new SaleTypeRepository(context);
+        var propertyRepository = new PropertyRepository(context);
+        var propertyTypeRepository = new PropertyTypeRepository(context);
 
-        return new PropertyService(repo, _mapper, accountMock.Object);
+        return new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
+            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
     }
 
     private async Task SeedDependencies(RealStateAppContext context)
@@ -81,7 +87,7 @@ public class PropertyServiceTests
                 AgentId = "agent1",
                 CreatedAt = DateTime.UtcNow,
                 Id = 0,
-                Description = "casa bonita en punta cana" 
+                Description = "casa bonita en punta cana"
             },
             new PropertyDto
             {
@@ -95,7 +101,7 @@ public class PropertyServiceTests
                 AgentId = "agent2",
                 CreatedAt = DateTime.UtcNow,
                 Id = 0,
-                Description = "casa linda en punta cana" 
+                Description = "casa linda en punta cana"
             }
         };
 
@@ -127,7 +133,7 @@ public class PropertyServiceTests
             AgentId = "agent",
             CreatedAt = DateTime.UtcNow,
             Id = 0,
-            Description = "descripcion" 
+            Description = "descripcion"
         };
 
         // Act
@@ -170,7 +176,7 @@ public class PropertyServiceTests
             Bathrooms = 1,
             AgentId = "agent",
             Description = "descripcion",
-            CreatedAt = DateTime.UtcNow, 
+            CreatedAt = DateTime.UtcNow,
         };
 
         context.Properties.Add(entity);
@@ -190,7 +196,7 @@ public class PropertyServiceTests
             Bathrooms = 3,
             AgentId = "agentUpdated",
             CreatedAt = DateTime.UtcNow,
-            Description = "descripcion" 
+            Description = "descripcion"
         };
 
         // Act
@@ -219,14 +225,13 @@ public class PropertyServiceTests
             Bathrooms = 3,
             AgentId = "agentUpdated",
             CreatedAt = DateTime.UtcNow,
-            Description = "descripcion" 
+            Description = "descripcion"
         };
 
         var result = await service.UpdateAsync(dto.Id, dto);
 
         result.IsFailure.Should().BeTrue();
     }
-
 
 
     [Fact]
@@ -246,7 +251,7 @@ public class PropertyServiceTests
             Bathrooms = 3,
             Description = "casa bonita",
             CreatedAt = DateTime.Now,
-            AgentId = "agenteid" 
+            AgentId = "agenteid"
         };
 
         context.Properties.Add(entity);
@@ -254,14 +259,23 @@ public class PropertyServiceTests
 
         var repository = new PropertyRepository(context);
         var accountMock = new Mock<IBaseAccountService>();
-        var service = new PropertyService(repository, _mapper, accountMock.Object);
+        var propertyImageRepository = new PropertyImageRepository(context);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var saleTypeRepository = new SaleTypeRepository(context);
+        var propertyRepository = new PropertyRepository(context);
+        var propertyTypeRepository = new PropertyTypeRepository(context);
+        var repo = new PropertyRepository(context);
+
+        var service =
+            new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
+                propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
 
         var result = await service.DeleteAsync(1);
         result.IsSuccess.Should().BeTrue();
         var exists = await context.Properties.FindAsync(1);
         exists.Should().BeNull();
     }
-
 
 
     [Fact]
@@ -329,8 +343,17 @@ public class PropertyServiceTests
         await context.SaveChangesAsync();
 
         var accountMock = new Mock<IBaseAccountService>(); // No hace falta introducir usuarios
+        var propertyImageRepository = new PropertyImageRepository(context);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var saleTypeRepository = new SaleTypeRepository(context);
+        var propertyRepository = new PropertyRepository(context);
+        var propertyTypeRepository = new PropertyTypeRepository(context);
         var repo = new PropertyRepository(context);
-        var service = new PropertyService(repo, _mapper, accountMock.Object);
+
+        var service =
+            new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
+                propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
 
         var filters = new PropertyFiltersDto
         {
@@ -435,9 +458,17 @@ public class PropertyServiceTests
         await context.SaveChangesAsync();
 
         var accountMock = new Mock<IBaseAccountService>();
+        var propertyImageRepository = new PropertyImageRepository(context);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var saleTypeRepository = new SaleTypeRepository(context);
+        var propertyRepository = new PropertyRepository(context);
+        var propertyTypeRepository = new PropertyTypeRepository(context);
         var repo = new PropertyRepository(context);
-        var service = new PropertyService(repo, _mapper, accountMock.Object);
 
+        var service =
+            new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
+                propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
         var filters = new PropertyFiltersDto
         {
             MinValue = 200,
@@ -458,8 +489,8 @@ public class PropertyServiceTests
         property.Code.Should().Be("000001");
         property.IsAvailable.Should().BeTrue();
     }
-    
-        [Fact]
+
+    [Fact]
     public async Task GetAllAvailablePropertiesAsync_Returns_Only_Favorites_Properties()
     {
         // Arrange
@@ -553,13 +584,23 @@ public class PropertyServiceTests
         await context.SaveChangesAsync();
 
         var accountMock = new Mock<IBaseAccountService>();
+
+        var propertyImageRepository = new PropertyImageRepository(context);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var saleTypeRepository = new SaleTypeRepository(context);
+        var propertyRepository = new PropertyRepository(context);
+        var propertyTypeRepository = new PropertyTypeRepository(context);
         var repo = new PropertyRepository(context);
-        var service = new PropertyService(repo, _mapper, accountMock.Object);
+
+        var service =
+            new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
+                propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
 
         var filters = new PropertyFiltersDto
         {
             ClientId = "clientId",
-            OnlyFavorites = true 
+            OnlyFavorites = true
         };
 
         // Act

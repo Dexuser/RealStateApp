@@ -335,8 +335,15 @@ public class PropertyTypeServiceTests
         await context.SaveChangesAsync();
 
         var accountMock = new Mock<IBaseAccountService>(); // No hace falta introducir usuarios
-        var repo = new PropertyRepository(context);
-        var service = new PropertyService(repo, _mapper, accountMock.Object);
+        var propertyImageRepository = new PropertyImageRepository(context);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var saleTypeRepository = new SaleTypeRepository(context);
+        var propertyRepository = new PropertyRepository(context);
+        var propertyTypeRepository = new PropertyTypeRepository(context);
+
+        var service =  new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
+            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
 
         var filters = new PropertyFiltersDto
         {
@@ -441,8 +448,15 @@ public class PropertyTypeServiceTests
         await context.SaveChangesAsync();
 
         var accountMock = new Mock<IBaseAccountService>();
-        var repo = new PropertyRepository(context);
-        var service = new PropertyService(repo, _mapper, accountMock.Object);
+        var propertyImageRepository = new PropertyImageRepository(context);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var saleTypeRepository = new SaleTypeRepository(context);
+        var propertyRepository = new PropertyRepository(context);
+        var propertyTypeRepository = new PropertyTypeRepository(context);
+
+        var service =  new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
+            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
 
         var filters = new PropertyFiltersDto
         {
@@ -559,8 +573,15 @@ public class PropertyTypeServiceTests
         await context.SaveChangesAsync();
 
         var accountMock = new Mock<IBaseAccountService>();
-        var repo = new PropertyRepository(context);
-        var service = new PropertyService(repo, _mapper, accountMock.Object);
+        var propertyImageRepository = new PropertyImageRepository(context);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var saleTypeRepository = new SaleTypeRepository(context);
+        var propertyRepository = new PropertyRepository(context);
+        var propertyTypeRepository = new PropertyTypeRepository(context);
+
+        var service =  new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
+            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
 
         var filters = new PropertyFiltersDto
         {

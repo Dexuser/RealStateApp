@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
-using RealStateApp.Core.Application.Services;
 using RealStateApp.Core.Application.ViewModels.Developer;
 using RealStateApp.Core.Application.ViewModels.User;
 using RealStateApp.Core.Domain.Common;
@@ -13,24 +12,17 @@ namespace RealStateApp.Areas.Admin.Controllers;
 
 [Area("Admin")]
 [Authorize(Roles = $"{nameof(Roles.Admin)}")] 
-public class DeveloperController : Controller
+public class DeveloperController(
+    IDeveloperService agentService,
+    IMapper mapper,
+    IAccountServiceForWebApp accountServiceForWebApp)
+    : Controller
 {
-    private readonly IAccountServiceForWebApp _accountServiceForWebApp;
-    private readonly IDeveloperService _developerService;
-    private readonly IMapper _mapper;
-
-    public DeveloperController(IDeveloperService agentService, IMapper mapper, IAccountServiceForWebApp accountServiceForWebApp)
-    {
-        _developerService = agentService;
-        _mapper = mapper;
-        _accountServiceForWebApp = accountServiceForWebApp;
-    }
-
     // GET
     public async Task<IActionResult> Index()
     {
-        var agents = await _developerService.GetAllDevelopers();
-        var agentsViewModels = _mapper.Map<List<UserViewModel>>(agents);
+        var agents = await agentService.GetAllDevelopers();
+        var agentsViewModels = mapper.Map<List<UserViewModel>>(agents);
         return View(agentsViewModels);
     }
 
@@ -58,9 +50,9 @@ public class DeveloperController : Controller
             return View(model);
         }
         
-        var userSave = _mapper.Map<UserSaveDto>(model);
+        var userSave = mapper.Map<UserSaveDto>(model);
         var origin = HttpContext.Request.Headers.Origin.FirstOrDefault() ?? "";
-        var createResult = await _developerService.Create(userSave, origin);
+        var createResult = await agentService.Create(userSave, origin);
 
         if (createResult.IsFailure)
         {
@@ -85,7 +77,7 @@ public class DeveloperController : Controller
             Id = "",
         };
 
-        var user = await _accountServiceForWebApp.GetUserById(userId);
+        var user = await accountServiceForWebApp.GetUserById(userId);
         if (user == null)
         {
             ViewBag.Message = "No se encontro un usuario con este ID";
@@ -103,7 +95,7 @@ public class DeveloperController : Controller
         model.IdentityCardNumber = user.IdentityCardNumber;
         model.Email = user.Email;
         model.UserName= user.UserName;
-        model.Role= user.Role.ToString();
+        model.Role= user.Role;
         model.Id= user.Id;
         
         return View(model);
@@ -117,9 +109,9 @@ public class DeveloperController : Controller
             return View(model); 
         }
         
-        var userSave = _mapper.Map<UserSaveDto>(model);
+        var userSave = mapper.Map<UserSaveDto>(model);
         var origin = HttpContext.Request.Headers.Origin.FirstOrDefault() ?? "";
-        await _developerService.Edit(userSave, origin);
+        await agentService.Edit(userSave, origin);
         return RedirectToAction(nameof(Index));
     }
 
@@ -127,7 +119,7 @@ public class DeveloperController : Controller
     
     public async Task<IActionResult> ChangeDeveloperState(string userId, bool state)
     {
-        var user = await _accountServiceForWebApp.GetUserById(userId);
+        var user = await accountServiceForWebApp.GetUserById(userId);
         if (user is null)
         {
             ViewBag.Message = "No se encontro al usuario";
@@ -135,7 +127,7 @@ public class DeveloperController : Controller
         
         return View(new ChangeUserStateViewModel
         {
-            UserId = user.Id,
+            UserId = user!.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
             State = state
@@ -145,7 +137,7 @@ public class DeveloperController : Controller
     [HttpPost]
     public async Task<IActionResult> ChangeDeveloperState(ChangeUserStateViewModel model)
     {
-        var stateResult = await _developerService.SetStateAsync(model.UserId, model.State);
+        var stateResult = await agentService.SetStateAsync(model.UserId, model.State);
         if (stateResult.IsFailure)
         {
             this.SendValidationErrorMessages(stateResult);
@@ -158,7 +150,7 @@ public class DeveloperController : Controller
     [HttpPost]
     public async Task<IActionResult> DeletePost(DeleteUserViewModel model)
     {
-        await _developerService.DeleteAsync(model.UserId);
+        await agentService.DeleteAsync(model.UserId);
         return RedirectToAction(nameof(Index));
     }
 }

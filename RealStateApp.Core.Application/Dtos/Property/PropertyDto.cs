@@ -1,5 +1,6 @@
 using RealStateApp.Core.Application.Dtos.ChatMessage;
 using RealStateApp.Core.Application.Dtos.FavoriteProperty;
+using RealStateApp.Core.Application.Dtos.Improvement;
 using RealStateApp.Core.Application.Dtos.Offer;
 using RealStateApp.Core.Application.Dtos.PropertyImage;
 using RealStateApp.Core.Application.Dtos.PropertyImprovement;
@@ -33,7 +34,7 @@ public class PropertyDto
 
     // Navigation
     public ICollection<PropertyImageDto> PropertyImages { get; set; } = [];
-    public ICollection<PropertyImprovementDto> PropertyImprovements { get; set; } = [];
+    public List<ImprovementDto> PropertyImprovements { get; set; } = [];
     public ICollection<OfferDto> Offers { get; set; } = [];
     public ICollection<ChatMessageDto> ChatMessages { get; set; } = [];
     public ICollection<FavoritePropertyDto> FavoriteProperties { get; set; } = [];

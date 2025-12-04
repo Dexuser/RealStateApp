@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.SaleType;
 using RealStateApp.Core.Application.Interfaces;
@@ -31,6 +32,18 @@ public class SaleTypeService : GenericServices<SaleType, SaleTypeDto>, ISaleType
             }).ToListAsync();
         
         return salesTypesWithCount;
+    }
+
+    public async Task<List<SelectListItem>> GetSelectListAsync()
+    {
+        var types = await _saleTypeRepository.GetAllAsync();
+
+        return types
+            .Select(t => new SelectListItem
+            {
+                Value = t.Id.ToString(),
+                Text = t.Name
+            }).ToList();
     }
 
     public override async Task<Result> DeleteAsync(int id)

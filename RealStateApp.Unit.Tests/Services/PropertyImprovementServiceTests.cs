@@ -35,7 +35,8 @@ public class PropertyImprovementTests
     {
         var context = new RealStateAppContext(_dbOptions);
         var propertyImprovementRepository = new PropertyImprovementRepository(context);
-        return new PropertyImprovementService(propertyImprovementRepository, _mapper);
+        var improvementRepository = new ImprovementRepository(context);
+        return new PropertyImprovementService(propertyImprovementRepository, _mapper, improvementRepository);
     }
 
     private async Task SeedDependencies(RealStateAppContext context)
@@ -216,8 +217,9 @@ public class PropertyImprovementTests
         context.PropertyImprovements.Add(entity);
         
         await context.SaveChangesAsync();
-        var repository = new PropertyImprovementRepository(context);
-        var service = new PropertyImprovementService(repository, _mapper);
+        var propertyImprovementRepository = new PropertyImprovementRepository(context);
+        var improvementRepository = new ImprovementRepository(context);
+        var service = new PropertyImprovementService(propertyImprovementRepository, _mapper, improvementRepository);
 
         // Act
         var result = await service.DeleteAsync(entity.Id);
