@@ -8,6 +8,8 @@ using RealStateApp.Core.Domain.Entities;
 using RealStateApp.Core.Domain.Interfaces;
 using RealStateApp.Infrastructure.Persistence.Contexts;
 
+namespace RealStateApp.Unit.Tests.Services;
+    
 public class DashBoardServiceTests
 {
     [Fact]

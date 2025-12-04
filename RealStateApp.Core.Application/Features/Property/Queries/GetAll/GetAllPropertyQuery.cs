@@ -1,4 +1,3 @@
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.Property;
@@ -16,13 +15,11 @@ public class GetAllPropertyQueryHandler : IRequestHandler<GetAllPropertyQuery, I
 {
     private readonly IBaseAccountService _baseAccountService;
     private readonly IPropertyRepository _repository;
-    private readonly IMapper _mapper;
 
-    public GetAllPropertyQueryHandler(IPropertyRepository repository, IMapper mapper,
+    public GetAllPropertyQueryHandler(IPropertyRepository repository, 
         IBaseAccountService baseAccountService)
     {
         _repository = repository;
-        _mapper = mapper;
         _baseAccountService = baseAccountService;
     }
 
@@ -40,8 +37,8 @@ public class GetAllPropertyQueryHandler : IRequestHandler<GetAllPropertyQuery, I
             {
                 Id = property.Id,
                 Code = property.Code,
-                PropertyType = property.PropertyType.Name,
-                SaleType = property.SaleType.Name,
+                PropertyType = property.PropertyType!.Name,
+                SaleType = property.SaleType!.Name,
                 Price = property.Price,
                 SizeInMeters = property.SizeInMeters,
                 Rooms = property.Rooms,
@@ -55,7 +52,7 @@ public class GetAllPropertyQueryHandler : IRequestHandler<GetAllPropertyQuery, I
                     Id = property.AgentId,
                     Name = "" 
                 }
-            }).ToListAsync();
+            }).ToListAsync(cancellationToken: cancellationToken);
 
         foreach (var property in properties)
         {

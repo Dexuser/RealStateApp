@@ -24,7 +24,7 @@ public class GetPropertyTypeByIdQueryHandler : IRequestHandler<GetPropertyTypeBy
     {
         var propertyType = await _propertyTypeRepository.GetByIdAsync(request.Id);
         
-        if (propertyType == null) throw new ApiException("Property not found", StatusCodes.Status404NotFound);
+        if (propertyType == null) throw new ApiException("PropertyType not found", StatusCodes.Status404NotFound);
 
         return new PropertyTypeApiDto
         {

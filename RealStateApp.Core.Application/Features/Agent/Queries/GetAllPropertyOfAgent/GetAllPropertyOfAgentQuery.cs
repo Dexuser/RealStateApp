@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using RealStateApp.Core.Application.Dtos.Agent;
 using RealStateApp.Core.Application.Dtos.Property;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Exceptions;
@@ -9,19 +8,19 @@ using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Domain.Common;
 using RealStateApp.Core.Domain.Interfaces;
 
-namespace RealStateApp.Core.Application.Features.Agent.Queries.GetAgentProperty;
+namespace RealStateApp.Core.Application.Features.Agent.Queries.GetAllPropertyOfAgent;
 
 public class GetAllPropertyOfAgentQuery : IRequest<List<PropertyApiDto>>
 {
     public required string Id { get; set; }
 }
 
-public class GetAgentPropertiesQueryHandler : IRequestHandler<GetAllPropertyOfAgentQuery, List<PropertyApiDto>>
+public class GetAllPropertiesOfAgentQueryHandler : IRequestHandler<GetAllPropertyOfAgentQuery, List<PropertyApiDto>>
 {
     private readonly IPropertyRepository _repository;
     private readonly IBaseAccountService _baseAccountService;
 
-    public GetAgentPropertiesQueryHandler(IPropertyRepository propertyRepository, IBaseAccountService baseAccountService)
+    public GetAllPropertiesOfAgentQueryHandler(IPropertyRepository propertyRepository, IBaseAccountService baseAccountService)
     {
         _repository = propertyRepository;
         _baseAccountService = baseAccountService;

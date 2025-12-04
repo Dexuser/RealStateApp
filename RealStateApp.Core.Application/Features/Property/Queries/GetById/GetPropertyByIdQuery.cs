@@ -1,4 +1,3 @@
-using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -19,12 +18,10 @@ public class GetPropertyByIdHandler : IRequestHandler<GetPropertyByIdQuery, Prop
 {
     private readonly IBaseAccountService _baseAccountService;
     private readonly IPropertyRepository _repository;
-    private readonly IMapper _mapper;
 
-    public GetPropertyByIdHandler(IPropertyRepository repository, IMapper mapper, IBaseAccountService baseAccountService)
+    public GetPropertyByIdHandler(IPropertyRepository repository, IBaseAccountService baseAccountService)
     {
         _repository = repository;
-        _mapper = mapper;
         _baseAccountService = baseAccountService;
     }
 
@@ -42,8 +39,8 @@ public class GetPropertyByIdHandler : IRequestHandler<GetPropertyByIdQuery, Prop
         {
             Id = property.Id,
             Code = property.Code,
-            PropertyType = property.PropertyType.Name,
-            SaleType = property.SaleType.Name,
+            PropertyType = property.PropertyType!.Name,
+            SaleType = property.SaleType!.Name,
             Price = property.Price,
             SizeInMeters = property.SizeInMeters,
             Rooms = property.Rooms,
@@ -54,7 +51,7 @@ public class GetPropertyByIdHandler : IRequestHandler<GetPropertyByIdQuery, Prop
             IsAvailable = property.IsAvailable,
             Agent = new SimpleAgentForPropertyApiDto
             {
-                Id = userDto.Id,
+                Id = userDto!.Id,
                 Name = $"{userDto.FirstName} {userDto.LastName}" 
             },
         };

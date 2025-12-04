@@ -1,11 +1,9 @@
-using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.Property;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Exceptions;
-using RealStateApp.Core.Application.Features.Property.Queries.GetById;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Domain.Interfaces;
 
@@ -20,12 +18,10 @@ public class GetPropertyByCodeHandler : IRequestHandler<GetPropertyByCodeQuery, 
 {
     private readonly IBaseAccountService  _baseAccountService;
     private readonly IPropertyRepository _repository;
-    private readonly IMapper _mapper;
 
-    public GetPropertyByCodeHandler(IPropertyRepository repository, IMapper mapper, IBaseAccountService baseAccountService)
+    public GetPropertyByCodeHandler(IPropertyRepository repository, IBaseAccountService baseAccountService)
     {
         _repository = repository;
-        _mapper = mapper;
         _baseAccountService = baseAccountService;
     }
 
@@ -43,8 +39,8 @@ public class GetPropertyByCodeHandler : IRequestHandler<GetPropertyByCodeQuery, 
         {
             Id = property.Id,
             Code = property.Code,
-            PropertyType = property.PropertyType.Name,
-            SaleType = property.SaleType.Name,
+            PropertyType = property.PropertyType!.Name,
+            SaleType = property.SaleType!.Name,
             Price = property.Price,
             SizeInMeters = property.SizeInMeters,
             Rooms = property.Rooms,
@@ -55,7 +51,7 @@ public class GetPropertyByCodeHandler : IRequestHandler<GetPropertyByCodeQuery, 
             IsAvailable = property.IsAvailable,
             Agent = new SimpleAgentForPropertyApiDto
             {
-                Id = userDto.Id,
+                Id = userDto!.Id,
                 Name = $"{userDto.FirstName} {userDto.LastName}" 
             },
         };
