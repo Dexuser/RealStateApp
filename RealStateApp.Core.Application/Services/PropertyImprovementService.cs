@@ -7,13 +7,19 @@ using RealStateApp.Core.Domain.Interfaces;
 
 namespace RealStateApp.Core.Application.Services;
 
-public class PropertyImprovementService(
-    IPropertyImprovementRepository repository,
-    IMapper mapper,
-    IImprovementRepository improvementRepository)
-    : GenericServices<PropertyImprovement, PropertyImprovementDto>(repository, mapper), IPropertyImprovementService
+public class PropertyImprovementService: GenericServices<PropertyImprovement, PropertyImprovementDto>, IPropertyImprovementService
 {
-    private readonly IImprovementRepository _improvementRepository = improvementRepository;
+    private IPropertyImprovementRepository _propertyImprovementRepository;
+    private readonly IImprovementRepository _improvementRepository;
+    private readonly IMapper _mapper;
+
+
+    public PropertyImprovementService(IPropertyImprovementRepository propertyImprovementRepository, IMapper mapper, IImprovementRepository improvementRepository) : base(propertyImprovementRepository, mapper)
+    {
+        _propertyImprovementRepository = propertyImprovementRepository;
+        _improvementRepository = improvementRepository;
+        _mapper = mapper;
+    }
 
     public async Task<List<SelectListItem>> GetSelectListAsync()
     {

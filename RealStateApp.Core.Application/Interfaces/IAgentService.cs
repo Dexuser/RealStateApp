@@ -3,7 +3,7 @@ using RealStateApp.Core.Application.Dtos.User;
 
 namespace RealStateApp.Core.Application.Interfaces;
 
-public interface IAgentService
+public interface IAgentService 
 {
     Task<List<AgentWithPropertyCountDto>> GetAllAgentsWithCount();
     Task<List<UserDto>> GetAllAgents(bool onlyActive = false, string? name = null);
