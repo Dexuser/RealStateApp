@@ -24,11 +24,11 @@ public class UpdatePropertyTypeCommand : IRequest<Unit>
     public required string Description { get; set; }
 }
 
-public class CreatePropertyTypeCommandHandler : IRequestHandler<UpdatePropertyTypeCommand, Unit>
+public class UpdatePropertyTypeCommandHandler : IRequestHandler<UpdatePropertyTypeCommand, Unit>
 {
     private readonly IPropertyTypeRepository _propertyTypeRepository;
 
-    public CreatePropertyTypeCommandHandler(IPropertyTypeRepository propertyTypeRepository)
+    public UpdatePropertyTypeCommandHandler(IPropertyTypeRepository propertyTypeRepository)
     {
         _propertyTypeRepository = propertyTypeRepository;
     }
@@ -36,13 +36,17 @@ public class CreatePropertyTypeCommandHandler : IRequestHandler<UpdatePropertyTy
 
     public async Task<Unit> Handle(UpdatePropertyTypeCommand request, CancellationToken cancellationToken)
     {
-        var propertyType = new Domain.Entities.PropertyType
+        var update = new Domain.Entities.PropertyType
         {
             Id = request.Id,
             Name = request.Name,
             Description = request.Description
         };
-        var result = await _propertyTypeRepository.UpdateAsync(propertyType.Id, propertyType);
+        
+        var propertyTypeInDb = await _propertyTypeRepository.GetByIdAsync(request.Id);
+        if (propertyTypeInDb == null) throw new ApiException("property type not found");
+        
+        var result = await _propertyTypeRepository.UpdateAsync(update.Id, update);
         return Unit.Value;
     }
 }

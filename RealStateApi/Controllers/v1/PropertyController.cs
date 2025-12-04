@@ -10,9 +10,10 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace RealStateApi.Controllers.v1;
 
-[ApiVersion("1.0"), Authorize(Roles = $"{nameof(Roles.Developer)},{nameof(Roles.Admin)}"),
- SwaggerTag("Endpoints para consultar propiedades")]
-public class PropertyController : BaseApiController 
+[ApiVersion("1.0")]
+[Authorize(Roles = $"{nameof(Roles.Developer)},{nameof(Roles.Admin)}")]
+[SwaggerTag("Endpoints to retrieve properties")]
+public class PropertyController : BaseApiController
 {
     // GET
     [HttpGet]
@@ -20,9 +21,9 @@ public class PropertyController : BaseApiController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Obtiene un listado de todas las propiedades",
-        Description = "Obtiene un listado de todas las propiedades incluyendo la información del agente que la administra"
-        )]
+        Summary = "Gets a list of all properties",
+        Description = "Retrieves a list of all properties including the information of the agent who manages them"
+    )]
     public async Task<IActionResult> Get()
     {
         var properties = await Mediator.Send(new GetAllPropertyQuery());
@@ -30,36 +31,35 @@ public class PropertyController : BaseApiController
         {
             return NoContent();
         }
-        
+
         return Ok(properties);
     }
-    
+
     [HttpGet("by-id/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PropertyApiDto))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Obtiene una propiedad por Id",
-        Description = "Obtiene la propiedad con el ID recibido."
-        
+        Summary = "Gets a property by Id",
+        Description = "Retrieves the property matching the provided ID."
     )]
     public async Task<IActionResult> GetPropertyById([FromRoute] int id)
     {
-        var properties = await Mediator.Send(new GetPropertyByIdQuery() {Id = id});
+        var properties = await Mediator.Send(new GetPropertyByIdQuery() { Id = id });
         return Ok(properties);
     }
-    
+
     [HttpGet("by-code/{code}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PropertyApiDto))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Obtiene una propiedad por el código",
-        Description = "Obtiene la propiedad con el código recibido."
-        
-    )]   [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        Summary = "Gets a property by code",
+        Description = "Retrieves the property matching the provided code."
+    )]
     public async Task<IActionResult> GetPropertyByCode([FromRoute] string code)
     {
-        var properties = await Mediator.Send(new GetPropertyByCodeQuery() {Code = code});
+        var properties = await Mediator.Send(new GetPropertyByCodeQuery() { Code = code });
         return Ok(properties);
     }
 }

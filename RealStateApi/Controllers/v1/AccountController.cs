@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace RealStateApi.Controllers.v1
 {
     [ApiVersion("1.0")]
-    [SwaggerTag("Endpoints para el registro, autenticación y recuperación de cuentas")]
+    [SwaggerTag("Endpoints for account registration, authentication and recovery")]
     public class AccountController(IAccountServiceForWebApi accountServiceForWebApi) : BaseApiController
     {
         private readonly IAccountServiceForWebApi _accountServiceForWebApi = accountServiceForWebApi;
@@ -21,8 +21,8 @@ namespace RealStateApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [SwaggerOperation(
-            Summary = "Autentica un usuario",
-            Description = "Valida las credenciales recibidas y devuelve un JWT en caso de que sean correctas"
+            Summary = "Authenticates a user",
+            Description = "Validates the provided credentials and returns a JWT if they are correct"
         )]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -35,7 +35,7 @@ namespace RealStateApi.Controllers.v1
                 return BadRequest400WithErrorMessagesFromResult(result);
             }
 
-            return Ok(new { token = result.Value});
+            return Ok(new { token = result.Value });
         }
 
         [Authorize(Roles = "Admin")]
@@ -44,14 +44,14 @@ namespace RealStateApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [SwaggerOperation(
-            Summary = "Registra un nuevo administrador en el sistema",
-            Description = "Crea un nuevo administrador en el sistema. Se puede enviar una imagen para este usuario"
+            Summary = "Registers a new administrator in the system",
+            Description = "Creates a new administrator in the system. An image can be uploaded for this user"
         )]
         public async Task<IActionResult> RegisterAdmin([FromForm] CreateUserDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            
+
             var save = new UserSaveDto
             {
                 Id = "",
@@ -73,7 +73,7 @@ namespace RealStateApi.Controllers.v1
             }
 
             save.Id = result.Value!.Id;
-            save.ProfileImagePath = FileHandler.Upload(dto.ProfileImage, save.Id , "users");
+            save.ProfileImagePath = FileHandler.Upload(dto.ProfileImage, save.Id, "users");
 
             var resultEdit = await _accountServiceForWebApi.EditUser(save, null, true);
 
@@ -82,22 +82,22 @@ namespace RealStateApi.Controllers.v1
                 return BadRequest400WithErrorMessagesFromResult(result);
             }
 
-
             return StatusCode(StatusCodes.Status201Created);
         }
-        
+
         [HttpPost("register-dev")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [SwaggerOperation(
-            Summary = "Registra un nuevo desarrollador",
-            Description = "Crea un nuevo desarrollador en el sistema. Se puede enviar una imagen para el usuario"
+            Summary = "Registers a new developer",
+            Description = "Creates a new developer in the system. An image can be uploaded for this user"
         )]
         public async Task<IActionResult> RegisterDeveloper([FromForm] CreateUserDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
+
             var save = new UserSaveDto
             {
                 Id = "",
@@ -119,7 +119,7 @@ namespace RealStateApi.Controllers.v1
             }
 
             save.Id = result.Value!.Id;
-            save.ProfileImagePath = FileHandler.Upload(dto.ProfileImage, save.Id , "users");
+            save.ProfileImagePath = FileHandler.Upload(dto.ProfileImage, save.Id, "users");
 
             var resultEdit = await _accountServiceForWebApi.EditUser(save, null, true);
 
@@ -128,11 +128,8 @@ namespace RealStateApi.Controllers.v1
                 return BadRequest400WithErrorMessagesFromResult(result);
             }
 
-
             return StatusCode(StatusCodes.Status201Created);
         }
-        
-
 
         [Authorize(Roles = "Admin")]
         [HttpPost("get-reset-token")]
@@ -140,8 +137,8 @@ namespace RealStateApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [SwaggerOperation(
-            Summary = "Genera un nuevo token con el que resetear la contraseña",
-            Description = "Genera un nuevo token para cambiar la contraseña de una cuenta. Esta se envia por Email"
+            Summary = "Generates a new password reset token",
+            Description = "Generates a new token to reset the account password. This token is sent via email"
         )]
         public async Task<IActionResult> GetResetToken([FromBody] ForgotPasswordApiRequestDto dto)
         {
@@ -169,8 +166,8 @@ namespace RealStateApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [SwaggerOperation(
-            Summary = "Resetea la contraseña del usuario",
-            Description = "Resetea la contraseña del usuario con el token enviado"
+            Summary = "Resets the user's password",
+            Description = "Resets the user's password using the provided token"
         )]
         public async Task<IActionResult> ChangePassword([FromBody] ResetPasswordRequestDto dto)
         {
