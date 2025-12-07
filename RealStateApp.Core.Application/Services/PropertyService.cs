@@ -1,4 +1,3 @@
-
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,7 +9,7 @@ using RealStateApp.Core.Application.Dtos.PropertyType;
 using RealStateApp.Core.Application.Dtos.SaleType;
 using RealStateApp.Core.Application.Handler;
 using RealStateApp.Core.Application.Interfaces;
-using RealStateApp.Core.Application.ViewModels.Property.Actions;
+using RealStateApp.Core.Application.ViewModels.Property;
 using RealStateApp.Core.Application.ViewModels.PropertyImage;
 using RealStateApp.Core.Domain.Entities;
 using RealStateApp.Core.Domain.Interfaces;
@@ -31,7 +30,7 @@ public class PropertyService(
 {
     private readonly IMapper _mapper = mapper;
 
-    
+
     public override async Task<PropertyDto?> GetByIdAsync(int id)
     {
         var property = await propertyRepository.GetAllQueryable()
@@ -51,7 +50,7 @@ public class PropertyService(
 
         return property;
     }
-    
+
     public async Task<List<PropertyDto>> GetAllAvailablePropertiesAsync(PropertyFiltersDto filtersDto)
     {
         var query = propertyRepository
@@ -139,7 +138,7 @@ public class PropertyService(
         return result;
     }
 
-   
+
     public async Task<Result<List<PropertyDto>>> GetAllByAgentIdAsync(string agentId)
     {
         try
@@ -167,8 +166,8 @@ public class PropertyService(
             return Result<List<PropertyDto>>.Fail($"Error: {ex.Message}");
         }
     }
-    
-    public async Task<Result<List<PropertyDto>>> GetPropertiesForMaintenanceAsync(string agentId)
+
+    public async Task<List<PropertyDto>> GetPropertiesForMaintenanceAsync(string agentId)
     {
         try
         {
@@ -180,8 +179,6 @@ public class PropertyService(
                 .Include(p => p.PropertyType)
                 .Include(p => p.SaleType)
                 .Include(p => p.PropertyImages)
-                .Include(p => p.PropertyImprovements)
-                .ThenInclude(pm => pm.Improvement)
                 .OrderByDescending(p => p.CreatedAt)
                 .Select(p => new PropertyDto
                 {
@@ -220,26 +217,15 @@ public class PropertyService(
                             PropertyId = pi.PropertyId,
                             IsMain = pi.IsMain,
                         })
-                        .ToList(),
-
-                    PropertyImprovements = p.PropertyImprovements
-                        .Select(pm => new ImprovementDto
-                        {
-                            Id = pm.Improvement!.Id,
-                            Name = pm.Improvement.Name,
-                            Description = pm.Improvement.Description
-                        }).ToList()
+                        .ToList()
                 })
                 .ToListAsync();
 
-            if (!properties.Any())
-                return Result<List<PropertyDto>>.Fail("No tienes propiedades disponibles registradas.");
-
-            return Result<List<PropertyDto>>.Ok(properties);
+            return properties;
         }
         catch (Exception ex)
         {
-            return Result<List<PropertyDto>>.Fail($"Error al obtener propiedades: {ex.Message}");
+            return [];
         }
     }
 
@@ -247,7 +233,7 @@ public class PropertyService(
     // ===========================================================
     // CREATE PROPERTY
     // ===========================================================
-    public async Task<Result<int>> CreatePropertyAsync(PropertyCreateViewModel vm, string agentId)
+    public async Task<Result<int>> CreatePropertyAsync(PropertyDto vm)
     {
         try
         {
@@ -262,58 +248,12 @@ public class PropertyService(
                 Rooms = vm.Rooms,
                 Bathrooms = vm.Bathrooms,
                 Description = vm.Description,
-                AgentId = agentId,
+                AgentId = vm.AgentId,
                 IsAvailable = true,
                 CreatedAt = DateTime.UtcNow,
             };
 
             await propertyRepository.AddAsync(property);
-
-            // MAIN IMAGE
-            if (vm.MainImage != null)
-            {
-                string imagePath = FileHandler.Upload(vm.MainImage, property.Id.ToString(), "properties")!;
-
-                var mainImage = new PropertyImage
-                {
-                    PropertyId = property.Id,
-                    ImagePath = imagePath,
-                    IsMain = true
-                };
-
-                await imageRepository.AddAsync(mainImage);
-            }
-
-            // ADDITIONAL IMAGES
-            if (vm.AdditionalImages != null)
-            {
-                foreach (var img in vm.AdditionalImages)
-                {
-                    string path = FileHandler.Upload(img, property.Id.ToString(), "properties")!;
-
-                    var imgEntity = new PropertyImage
-                    {
-                        PropertyId = property.Id,
-                        ImagePath = path,
-                        IsMain = false
-                    };
-
-                    await imageRepository.AddAsync(imgEntity);
-                }
-            }
-
-            // IMPROVEMENTS
-            if (vm.SelectedImprovements.Any())
-            {
-                foreach (var improvementId in vm.SelectedImprovements)
-                {
-                    await propertyImprovementRepository.AddAsync(new PropertyImprovement
-                    {
-                        PropertyId = property.Id,
-                        ImprovementId = improvementId
-                    });
-                }
-            }
 
             return Result<int>.Ok(property.Id);
         }
@@ -381,7 +321,7 @@ public class PropertyService(
             return Result<PropertyEditViewModel>.Fail($"Error al cargar la propiedad: {ex.Message}");
         }
     }
-    
+
     public async Task<Result<bool>> EditPropertyAsync(PropertyEditViewModel vm)
     {
         try
@@ -496,6 +436,7 @@ public class PropertyService(
                     ImprovementId = impId
                 });
             }
+
             return Result<bool>.Ok(true);
         }
         catch (Exception ex)

@@ -11,6 +11,7 @@ using RealStateApp.Core.Application.ViewModels.PropertyImprovement;
 using RealStateApp.Core.Application.ViewModels.PropertyType;
 using RealStateApp.Core.Application.ViewModels.SaleType;
 using RealStateApp.Core.Application.ViewModels.User;
+using RealStateApp.Core.Domain.Enum;
 
 namespace RealStateApp.Core.Application.ViewModels.Property;
 
@@ -27,7 +28,8 @@ public class PropertyViewModel
     public required int Rooms { get; set; }
     public required int Bathrooms { get; set; }
     public required string Description { get; set; }
-    public bool IsAvailable { get; set; } // true = available, false = sold
+    public bool IsAvailable { get; set; } // true == Avaliable, False == Sold
+    public string? FirstImageUrl { get; set; } //Esto es para la primera imagen que ese ve algo asi como la main Image
     public required DateTime CreatedAt { get; set; }
     public required string AgentId { get; set; }
     public bool IsFavorite { get; set; }

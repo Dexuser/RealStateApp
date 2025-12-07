@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.Agent;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
+using RealStateApp.Core.Application.ViewModels.Agent;
 using RealStateApp.Core.Domain.Common;
 using RealStateApp.Core.Domain.Interfaces;
 
@@ -12,9 +13,9 @@ public class AgentService : IAgentService
     private readonly IBaseAccountService _accountServiceForWebApp;
     private readonly IPropertyRepository _propertyRepository;
 
-    public AgentService(IBaseAccountService accountServiceForWebApp, IPropertyRepository propertyRepository)
+    public AgentService(IBaseAccountService accountService, IPropertyRepository propertyRepository)
     {
-        _accountServiceForWebApp = accountServiceForWebApp;
+        _accountServiceForWebApp = accountService;
         _propertyRepository = propertyRepository;
     }
 
@@ -65,4 +66,10 @@ public class AgentService : IAgentService
          }
          return deleteResult;
     }
+    
+    public Task<Result<UserDto>> GetProfileByIdAsync(string id)
+        => _accountServiceForWebApp.GetUserByIdResult(id);
+
+    public Task<Result<bool>> UpdateProfileAsync(AgentProfileViewModel vm)
+        => _accountServiceForWebApp.UpdateAgentProfileAsync(vm);
 }

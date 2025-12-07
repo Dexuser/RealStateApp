@@ -1,4 +1,4 @@
-﻿namespace RealStateApp.Core.Application.ViewModels.Property.Actions;
+﻿namespace RealStateApp.Core.Application.ViewModels.Property;
 
 public class PropertyDeleteViewModel
 {

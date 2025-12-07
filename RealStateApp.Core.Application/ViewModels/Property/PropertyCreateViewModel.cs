@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace RealStateApp.Core.Application.ViewModels.Property.Actions;
+namespace RealStateApp.Core.Application.ViewModels.Property;
 
 public class PropertyCreateViewModel
 {
     
-    [Required]
     public string Code { get; set; } = string.Empty;
 
     [Required]

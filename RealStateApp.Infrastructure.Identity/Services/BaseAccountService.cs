@@ -7,31 +7,35 @@ using RealStateApp.Core.Application;
 using RealStateApp.Core.Application.Dtos.Email;
 using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Dtos.User;
+using RealStateApp.Core.Application.Handler;
 using RealStateApp.Core.Application.Interfaces;
+using RealStateApp.Core.Application.ViewModels.Agent;
 using RealStateApp.Core.Domain.Common;
 using RealStateApp.Infrastructure.Identity.Entities;
 
 namespace RealStateApp.Infrastructure.Identity.Services
 {
     //TODO arreglar los campos de User y aplicar la logica de los requerimientos
-    
+
     public class BaseAccountService : IBaseAccountService
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
-        
-        public BaseAccountService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IEmailService emailService, IMapper mapper)
+
+        public BaseAccountService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
+            IEmailService emailService, IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
             _mapper = mapper;
         }
-        
+
         // En el ModelState, los Empty strings serán los errores generales
-        public virtual async Task<Result<UserDto>> RegisterUser(UserSaveDto saveDto, string? origin, bool? isApi = false)
+        public virtual async Task<Result<UserDto>> RegisterUser(UserSaveDto saveDto, string? origin,
+            bool? isApi = false)
         {
             var userWithSameUserName = await _userManager.FindByNameAsync(saveDto.UserName);
             if (userWithSameUserName != null)
@@ -44,13 +48,13 @@ namespace RealStateApp.Infrastructure.Identity.Services
             {
                 return Result<UserDto>.Fail($"this email: {saveDto.Email} is already taken.");
             }
-            
+
             var userWithSameIdentityCardNumber = await _userManager.Users
                 .FirstOrDefaultAsync(u => u.IdentityCardNumber == saveDto.IdentityCardNumber);
             if (userWithSameIdentityCardNumber != null)
             {
-                
-                return Result<UserDto>.Fail($"This Identity Card Number: {saveDto.IdentityCardNumber} is already taken.");
+                return Result<UserDto>.Fail(
+                    $"This Identity Card Number: {saveDto.IdentityCardNumber} is already taken.");
             }
 
             // Clientes y agentes se crean innactivos. los clientes reciben correos, los agentes no.
@@ -64,9 +68,9 @@ namespace RealStateApp.Infrastructure.Identity.Services
             {
                 return Result<UserDto>.Fail(result.Errors.Select(s => s.Description).ToList());
             }
-            
+
             await _userManager.AddToRoleAsync(user, saveDto.Role);
-            
+
             // El unico rol que se verifica por correo es cliente
             //if (isApi != null && !isApi.Value)
             if (saveDto.Role == nameof(Roles.Client))
@@ -79,50 +83,52 @@ namespace RealStateApp.Infrastructure.Identity.Services
                     Subject = "Confirm registration"
                 });
             }
-           
+
             var rolesList = await _userManager.GetRolesAsync(user);
             var userDto = _mapper.Map<UserDto>(user);
             userDto.Role = rolesList[0]; // Asumimos que en este sistema solamente se tiene un rol
-           
+
             return Result<UserDto>.Ok(userDto);
         }
-        
-        
+
+
         public virtual async Task<Result<UserDto>> EditUser(UserSaveDto saveDto, string? origin, bool? isApi = false)
         {
-
-            var userWithSameUserName = await _userManager.Users.FirstOrDefaultAsync(w => w.UserName == saveDto.UserName && w.Id != saveDto.Id);
+            var userWithSameUserName =
+                await _userManager.Users.FirstOrDefaultAsync(w => w.UserName == saveDto.UserName && w.Id != saveDto.Id);
             if (userWithSameUserName != null)
             {
                 return Result<UserDto>.Fail($"this username: {saveDto.UserName} is already taken.");
-                
             }
 
-            var userWithSameEmail = await _userManager.Users.FirstOrDefaultAsync(w => w.Email == saveDto.Email && w.Id != saveDto.Id);
+            var userWithSameEmail =
+                await _userManager.Users.FirstOrDefaultAsync(w => w.Email == saveDto.Email && w.Id != saveDto.Id);
             if (userWithSameEmail != null)
             {
                 return Result<UserDto>.Fail($"this email: {saveDto.Email} is already taken.");
             }
-            
+
             var userWithSameIdentityCardNumber = await _userManager.Users
                 .FirstOrDefaultAsync(u => u.IdentityCardNumber == saveDto.IdentityCardNumber && u.Id != saveDto.Id);
             if (userWithSameIdentityCardNumber != null)
             {
-                
-                return Result<UserDto>.Fail($"This Identity Card Number: {saveDto.IdentityCardNumber} is already taken.");
+                return Result<UserDto>.Fail(
+                    $"This Identity Card Number: {saveDto.IdentityCardNumber} is already taken.");
             }
 
             var user = await _userManager.FindByIdAsync(saveDto.Id);
 
             if (user == null)
             {
-                return Result<UserDto>.Fail( $"There is no account registered with this user");
+                return Result<UserDto>.Fail($"There is no account registered with this user");
             }
 
             user.IdentityCardNumber = saveDto.IdentityCardNumber;
             user.FirstName = saveDto.FirstName;
             user.LastName = saveDto.LastName;
-            user.ProfileImagePath = string.IsNullOrWhiteSpace(saveDto.ProfileImagePath) ? user.ProfileImagePath : saveDto.ProfileImagePath;
+            user.ProfileImagePath = string.IsNullOrWhiteSpace(saveDto.ProfileImagePath)
+                ? user.ProfileImagePath
+                : saveDto.ProfileImagePath;
             user.PhoneNumber = string.IsNullOrWhiteSpace(saveDto.PhoneNumber) ? user.PhoneNumber : saveDto.PhoneNumber;
             user.UserName = saveDto.UserName;
             user.EmailConfirmed = user.EmailConfirmed && user.Email == saveDto.Email;
@@ -144,11 +150,11 @@ namespace RealStateApp.Infrastructure.Identity.Services
             {
                 return Result<UserDto>.Fail(result.Errors.Select(s => s.Description).ToList());
             }
-           
+
             var rolesList = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, rolesList.ToList());
             await _userManager.AddToRoleAsync(user, saveDto.Role);
-            
+
             var updatedRolesList = await _userManager.GetRolesAsync(user);
             var userDto = _mapper.Map<UserDto>(user);
             userDto.Role = updatedRolesList[0]; // Asumimos que en este sistema solamente se tiene un rol
@@ -194,13 +200,13 @@ namespace RealStateApp.Infrastructure.Identity.Services
         public virtual async Task<Result> ResetPasswordAsync(ResetPasswordRequestDto request)
         {
             var user = await _userManager.FindByIdAsync(request.UserId);
-            
+
             if (user == null)
             {
                 return Result.Fail($"There is no account registered with this user");
             }
 
-            var token= Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
+            var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
             var result = await _userManager.ResetPasswordAsync(user, token, request.Password);
             if (!result.Succeeded)
             {
@@ -212,6 +218,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
 
             return Result.Ok();
         }
+
         public virtual async Task<Result> DeleteAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -220,6 +227,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
             {
                 return Result.Fail($"There is no account registered with this user");
             }
+
             await _userManager.DeleteAsync(user);
 
             return Result.Ok();
@@ -239,13 +247,12 @@ namespace RealStateApp.Infrastructure.Identity.Services
 
 
             return userDto;
-            
         }
-        
+
         public virtual async Task<UserDto?> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            
+
             if (user == null)
             {
                 return null;
@@ -254,7 +261,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
             var rolesList = await _userManager.GetRolesAsync(user);
             var userDto = _mapper.Map<UserDto>(user);
             userDto.Role = rolesList[0]; // Asumimos que en este sistema solamente se tiene un rol
-            
+
             return userDto;
         }
 
@@ -275,9 +282,9 @@ namespace RealStateApp.Infrastructure.Identity.Services
                            .Result.FirstOrDefault() ??
                        "",
                 IdentityCardNumber = user.IdentityCardNumber,
-                PhoneNumber = user.PhoneNumber 
+                PhoneNumber = user.PhoneNumber
             }).ToList();
-            
+
             return usersDtos;
         }
 
@@ -318,6 +325,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
             {
                 return null;
             }
+
             var rolesList = await _userManager.GetRolesAsync(user);
             var userDto = new UserDto
             {
@@ -379,7 +387,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
             {
                 usersInRole = usersInRole.Where(u => u.EmailConfirmed).ToList();
             }
-            
+
             List<UserDto> listUsersDtos = [];
             listUsersDtos.AddRange(usersInRole.Select(user => new UserDto
             {
@@ -395,7 +403,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
                 ProfileImagePath = user.ProfileImagePath,
                 PhoneNumber = user.PhoneNumber
             }));
-            return listUsersDtos; 
+            return listUsersDtos;
         }
 
         public async Task<List<string>> GetAllUserIdsOfRole(Roles role, bool isActive = true)
@@ -405,8 +413,8 @@ namespace RealStateApp.Infrastructure.Identity.Services
             {
                 usersInRole = usersInRole.Where(u => u.EmailConfirmed).ToList();
             }
-            
-            var usersIds =  usersInRole.Select(u => u.Id).ToList();
+
+            var usersIds = usersInRole.Select(u => u.Id).ToList();
             return usersIds;
         }
 
@@ -442,11 +450,10 @@ namespace RealStateApp.Infrastructure.Identity.Services
         }
 
 
-
         public virtual async Task<Result> ConfirmAccountAsync(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            
+
             if (user == null)
             {
                 return Result<UserDto>.Fail("There is no account registered with this user");
@@ -454,65 +461,113 @@ namespace RealStateApp.Infrastructure.Identity.Services
 
             token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
             var result = await _userManager.ConfirmEmailAsync(user, token);
-            
+
             if (!result.Succeeded)
             {
-
                 return Result<UserDto>.Fail($"An error occurred while confirming this email {user.Email}");
             }
-            
+
             return Result.Ok();
         }
-        
 
-    public async Task<Result> SetStateOnUser(string userId, bool state)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null) 
-            return Result.Fail($"There is no account registered with this username: {userId}");
-        
-        user.EmailConfirmed = state;
-        var updateResult = await _userManager.UpdateAsync(user);
-
-        if (!updateResult.Succeeded)
+        public async Task<Result<UserDto>> GetUserByIdResult(string id)
         {
-            return Result.Fail(updateResult.Errors.Select(s => s.Description).ToList());
-        }
-        
-        return Result.Ok();
-    }
+            var user = await _userManager.FindByIdAsync(id);
 
-    public async Task<bool> ThisEmailExists(string email, string? id = null)
-    {
-        if (!string.IsNullOrWhiteSpace(id))
-        {
-            return await _userManager.Users.AnyAsync(u => u.Email == email && u.Id != id);
+            if (user == null)
+                return Result<UserDto>.Fail("Usuario no encontrado");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var dto = _mapper.Map<UserDto>(user);
+            dto.Role = roles.FirstOrDefault() ?? "";
+
+            return Result<UserDto>.Ok(dto);
         }
 
-        return await _userManager.Users.AnyAsync(u => u.Email == email);
-    }
-    
-    public async Task<bool> ThisUsernameExists(string userName, string? id)
-    {
-        if (!string.IsNullOrWhiteSpace(id))
+        public async Task<Result<bool>> UpdateAgentProfileAsync(AgentProfileViewModel vm)
         {
-            return await _userManager.Users.AnyAsync(u => u.UserName == userName && u.Id != id);
+            var user = await _userManager.FindByIdAsync(vm.Id);
+
+            if (user == null)
+                return Result<bool>.Fail("Usuario no encontrado");
+
+            user.FirstName = vm.FirstName;
+            user.LastName = vm.LastName;
+            user.PhoneNumber = vm.PhoneNumber;
+            user.Email = vm.Email;
+            user.UserName = vm.UserName;
+
+            if (vm.ProfileImage != null)
+            {
+                var newPath = FileHandler.Upload(
+                    vm.ProfileImage,
+                    user.Id,
+                    "agents",
+                    true,
+                    user.ProfileImagePath
+                );
+
+                user.ProfileImagePath = newPath;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                return Result<bool>.Fail(result.Errors.Select(e => e.Description).ToList());
+
+            return Result<bool>.Ok(true);
         }
 
-        return await _userManager.Users.AnyAsync(u => u.UserName == userName);
-    }
+
+        public async Task<Result> SetStateOnUser(string userId, bool state)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return Result.Fail($"There is no account registered with this username: {userId}");
+
+            user.EmailConfirmed = state;
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+            {
+                return Result.Fail(updateResult.Errors.Select(s => s.Description).ToList());
+            }
+
+            return Result.Ok();
+        }
+
+        public async Task<bool> ThisEmailExists(string email, string? id = null)
+        {
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                return await _userManager.Users.AnyAsync(u => u.Email == email && u.Id != id);
+            }
+
+            return await _userManager.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> ThisUsernameExists(string userName, string? id)
+        {
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                return await _userManager.Users.AnyAsync(u => u.UserName == userName && u.Id != id);
+            }
+
+            return await _userManager.Users.AnyAsync(u => u.UserName == userName);
+        }
 
 
-    
-    #region "Protected methods"
+        #region "Protected methods"
 
         protected async Task<string> GetVerificationEmailUri(AppUser user, string origin)
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
             var route = "Login/ConfirmEmail";
-            var completeUrl = new Uri(string.Concat(origin, "/", route));// origin = https://localhost:58296 route=Login/ConfirmEmail
+            var completeUrl =
+                new Uri(string.Concat(origin, "/", route)); // origin = https://localhost:58296 route=Login/ConfirmEmail
             var verificationUri = QueryHelpers.AddQueryString(completeUrl.ToString(), "userId", user.Id);
             verificationUri = QueryHelpers.AddQueryString(verificationUri.ToString(), "token", token);
 
@@ -526,12 +581,14 @@ namespace RealStateApp.Infrastructure.Identity.Services
 
             return token;
         }
+
         protected async Task<string> GetResetPasswordUri(AppUser user, string origin)
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
             var route = "Login/ResetPassword";
-            var completeUrl = new Uri(string.Concat(origin, "/", route));// origin = https://localhost:58296 route=Login/ConfirmEmail
+            var completeUrl =
+                new Uri(string.Concat(origin, "/", route)); // origin = https://localhost:58296 route=Login/ConfirmEmail
             var resetUri = QueryHelpers.AddQueryString(completeUrl.ToString(), "userId", user.Id);
             resetUri = QueryHelpers.AddQueryString(resetUri.ToString(), "token", token);
 
@@ -545,7 +602,7 @@ namespace RealStateApp.Infrastructure.Identity.Services
 
             return token;
         }
-        
-       #endregion
+
+        #endregion
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RealStateApp.Core.Application.ViewModels.PropertyImage;
 
-namespace RealStateApp.Core.Application.ViewModels.Property.Actions;
+namespace RealStateApp.Core.Application.ViewModels.Property;
 
 public class PropertyEditViewModel
 {

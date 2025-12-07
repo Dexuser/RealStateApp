@@ -14,7 +14,7 @@
             <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
 
-                    @if (Model.PropertyImages != null && Model.PropertyImages.Any())
+                    @if (Model.PropertyImages.Any())
                     {
                         int i = 0;
                         foreach (var img in Model.PropertyImages)
@@ -112,7 +112,7 @@
                         <div class="col-md-4">
                             <div class="border rounded p-2 bg-light h-100">
                                 <strong>Estado:</strong><br/>
-                                @(Model.IsAvailable ? "Disponible" : "Vendida")
+                                @(Model.IsAvailable)
                             </div>
                         </div>
 

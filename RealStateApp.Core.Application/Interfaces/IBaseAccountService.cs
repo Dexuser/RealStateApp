@@ -1,5 +1,6 @@
 using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Dtos.User;
+using RealStateApp.Core.Application.ViewModels.Agent;
 using RealStateApp.Core.Domain.Common;
 
 namespace RealStateApp.Core.Application.Interfaces;
@@ -23,5 +24,7 @@ public interface IBaseAccountService
     Task<int> CountUsers(Roles? role, bool? onlyActive = null);
     Task<Result> SetStateOnUser(string userId, bool state);
     Task<Result> ConfirmAccountAsync(string userId, string token);
+    Task<Result<UserDto>> GetUserByIdResult(string id);
+    Task<Result<bool>> UpdateAgentProfileAsync(AgentProfileViewModel vm);
 }
 
