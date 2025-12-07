@@ -141,7 +141,7 @@ public class LoginController : Controller
                     return RedirectToRoute(new { area="Admin" ,controller = "Home", action = "Index" });
 
                 case Roles.Agent:
-                    return RedirectToRoute(new { area="Agent" ,controller = "Home", action = "Index" });
+                    return RedirectToRoute(new { area="Agent" ,controller = "AgentProperty", action = "Index" });
                 
                 case Roles.Client:
                     return RedirectToRoute(new { area="Client" , controller = "Home", action = "Index" });
