@@ -112,7 +112,7 @@
                         <div class="col-md-4">
                             <div class="border rounded p-2 bg-light h-100">
                                 <strong>Estado:</strong><br/>
-                                @(Model.IsAvailable)
+                                @(Model.IsAvailable ? "Disponible" : "Vendida" )
                             </div>
                         </div>
 

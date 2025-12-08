@@ -13,17 +13,17 @@ namespace RealStateApi.Controllers.v1;
 
 [ApiVersion("1.0")]
 [Authorize(Roles = $"{nameof(Roles.Developer)},{nameof(Roles.Admin)}")]
-[SwaggerTag("Endpoints para el mantenimiento de mejoras (Improvements)")]
+[SwaggerTag("Endpoints for managing improvements (Improvements)")]
 public class ImprovementController : BaseApiController
 {
-   
+
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Obtiene todas las mejoras",
-        Description = "Devuelve un listado con todas las mejoras registradas en el sistema."
+        Summary = "Gets all improvements",
+        Description = "Returns a list of all improvements registered in the system."
     )]
     public async Task<IActionResult> Get()
     {
@@ -35,64 +35,62 @@ public class ImprovementController : BaseApiController
         return Ok(result);
     }
 
-  
+
     [HttpGet("by-id/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Obtiene una mejora por ID",
-        Description = "Devuelve la mejora correspondiente al ID especificado."
+        Summary = "Gets an improvement by ID",
+        Description = "Returns the improvement corresponding to the specified ID."
     )]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var result = await Mediator.Send(new GetImprovementByIdQuery { Id = id });
 
         if (result == null)
-            return NotFound("Mejora no encontrada.");
+            return NotFound("Improvement not found.");
 
         return Ok(result);
     }
 
-    
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Crea una nueva mejora",
-        Description = "Registra una nueva mejora en el sistema."
+        Summary = "Creates a new improvement",
+        Description = "Registers a new improvement in the system."
     )]
     public async Task<IActionResult> Create([FromBody] CreateImprovementCommand command)
     {
         var created = await Mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
-    
-    [HttpPut("{id:int}")]
+
+
+    [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Actualiza una mejora",
-        Description = "Modifica la información de la mejora especificada."
+        Summary = "Updates an improvement",
+        Description = "Modifies the information of the specified improvement."
     )]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateImprovementCommand command)
+    public async Task<IActionResult> Update([FromBody] UpdateImprovementCommand command)
     {
-        if (id != command.Id)
-            return BadRequest("El ID de la ruta no coincide con el del body.");
-
         var updated = await Mediator.Send(command);
         return Ok(updated);
     }
 
-    
+
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Elimina una mejora",
-        Description = "Elimina la mejora correspondiente al ID recibido."
+        Summary = "Deletes an improvement",
+        Description = "Deletes the improvement corresponding to the specified ID."
     )]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {

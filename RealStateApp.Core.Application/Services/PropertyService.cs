@@ -60,6 +60,9 @@ public class PropertyService(
             .AsNoTracking()
             .AsSplitQuery()
             .Where(p => p.IsAvailable);
+        
+        if (!string.IsNullOrEmpty(filtersDto.PropertyCode))
+            query = query.Where(p => p.Code.Contains(filtersDto.PropertyCode));
 
         if (!string.IsNullOrEmpty(filtersDto.AgentId))
             query = query.Where(p => p.AgentId == filtersDto.AgentId);
@@ -149,7 +152,7 @@ public class PropertyService(
                 .GetAllQueryable()
                 .AsNoTracking()
                 .AsSplitQuery()
-                .Where(p => p.AgentId == agentId)
+                .Where(p => p.AgentId == agentId && p.IsAvailable)
                 .Include(p => p.PropertyType)
                 .Include(p => p.SaleType)
                 .Include(p => p.PropertyImages)

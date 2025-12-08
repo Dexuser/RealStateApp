@@ -55,6 +55,7 @@ public class HomeController : Controller
             Rooms = filters.Rooms,
             ClientId = userId,
             OnlyFavorites = filters.OnlyFavorites,
+            PropertyCode = filters.PropertyCode
         };
 
         var model = new HomeIndexViewModel()

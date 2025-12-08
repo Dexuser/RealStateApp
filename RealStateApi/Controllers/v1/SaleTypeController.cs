@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RealStateApp.Core.Application.Features.Agent.Queries.GetAll;
 using RealStateApp.Core.Application.Features.SaleType.Commands.Create;
 using RealStateApp.Core.Application.Features.SaleType.Commands.Delete;
 using RealStateApp.Core.Application.Features.SaleType.Commands.Update;
@@ -14,17 +13,16 @@ namespace RealStateApi.Controllers.v1;
 
 [ApiVersion("1.0")]
 [Authorize(Roles = $"{nameof(Roles.Developer)},{nameof(Roles.Admin)}")]
-[SwaggerTag("Endpoints para mantenimiento de tipos de ventas")]
+[SwaggerTag("Endpoints for managing sale types.")]
 public class SaleTypeController : BaseApiController
 {
-    
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Obtiene todos los tipos de venta",
-        Description = "Devuelve un listado con todos los tipos de venta registrados en el sistema."
+        Summary = "Gets all sale types",
+        Description = "Returns a list of all sale types registered in the system."
     )]
     public async Task<IActionResult> Get()
     {
@@ -36,32 +34,31 @@ public class SaleTypeController : BaseApiController
         return Ok(result);
     }
 
-    
     [HttpGet("by-id/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Obtiene un tipo de venta por ID",
-        Description = "Busca y devuelve el tipo de venta con el ID especificado."
+        Summary = "Gets a sale type by ID",
+        Description = "Searches and returns the sale type with the specified ID."
     )]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var result = await Mediator.Send(new GetSaleTypeByIdQuery { Id = id });
 
         if (result == null)
-            return NotFound("Tipo de venta no encontrado.");
+            return NotFound("Sale type not found.");
 
         return Ok(result);
     }
-    
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Crea un nuevo tipo de venta",
-        Description = "Registra un nuevo tipo de venta en el sistema."
+        Summary = "Creates a new sale type",
+        Description = "Registers a new sale type in the system."
     )]
     public async Task<IActionResult> Create([FromBody] CreateSaleTypeCommand command)
     {
@@ -69,31 +66,26 @@ public class SaleTypeController : BaseApiController
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    
-    [HttpPut("{id:int}")]
+    [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Actualiza un tipo de venta",
-        Description = "Modifica la información del tipo de venta especificado."
+        Summary = "Updates a sale type",
+        Description = "Updates the information of the specified sale type."
     )]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateSaleTypeCommand command)
+    public async Task<IActionResult> Update([FromBody] UpdateSaleTypeCommand command)
     {
-        if (id != command.Id)
-            return BadRequest("El ID de la ruta no coincide con el del body.");
-
         var updated = await Mediator.Send(command);
         return Ok(updated);
     }
 
-    
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Elimina un tipo de venta",
-        Description = "Elimina el tipo de venta correspondiente al ID recibido."
+        Summary = "Deletes a sale type",
+        Description = "Deletes the sale type associated with the provided ID."
     )]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
