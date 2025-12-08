@@ -66,10 +66,9 @@ public class AgentService : IAgentService
          }
          return deleteResult;
     }
-    
-    public Task<Result<UserDto>> GetProfileByIdAsync(string id)
-        => _accountServiceForWebApp.GetUserByIdResult(id);
-
-    public Task<Result<bool>> UpdateProfileAsync(AgentProfileViewModel vm)
-        => _accountServiceForWebApp.UpdateAgentProfileAsync(vm);
+    public async Task<Result<UserDto>> Edit(UserSaveDto dto, string? origin)
+    {
+        dto.Role = nameof(Roles.Agent); // Solo para rectificar. Al fin y al cabo este metodo es un decorador
+        return await _accountServiceForWebApp.EditUser(dto, origin);
+    }
 }

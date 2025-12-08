@@ -1,0 +1,284 @@
+@using System.Security.Claims
+@using RealStateApp.Core.Domain.Common
+@model RealStateApp.Core.Application.ViewModels.Property.AgentDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Propiedad {Model.Property.Code}";
+}
+
+<div class="container py-4">
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+
+                    @if (Model.Property.PropertyImages.Any())
+                    {
+                        int i = 0;
+                        foreach (var img in Model.Property.PropertyImages)
+                        {
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@img.ImagePath"
+                                     class="d-block w-100"
+                                     style="height: 460px; object-fit: cover; border-radius:12px;" />
+                            </div>
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        <div class="carousel-item active">
+                            <img src="/images/no-image.png" class="d-block w-100" />
+                        </div>
+                    }
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+
+                <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        @* COLUMNA IZQUIERDA *@
+        <div class="col-md-8">
+
+            @* Descripción *@
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Descripción</h4>
+                    <p class="text-muted">@Model.Property.Description</p>
+                </div>
+            </div>
+
+            @* Características *@
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Características</h4>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Precio:</strong><br />
+                                RD$ @Model.Property.Price.ToString("N0")
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Tamaño:</strong><br />
+                                @Model.Property.SizeInMeters m²
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Habitaciones:</strong><br />
+                                @Model.Property.Rooms
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Baños:</strong><br />
+                                @Model.Property.Bathrooms
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Tipo de Propiedad:</strong><br />
+                                @Model.Property.PropertyType?.Name
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Tipo de Venta:</strong><br />
+                                @Model.Property.SaleType?.Name
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Estado:</strong><br />
+                                @(Model.Property.IsAvailable)
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2 bg-light h-100">
+                                <strong>Publicada el:</strong><br />
+                                @Model.Property.CreatedAt.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            @* Mejoras *@
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Mejoras de la Propiedad</h4>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        @if (!Model.Property.PropertyImprovements.Any())
+                        {
+                            <div class="text-center text-muted">
+                                Esta propiedad no tiene mejoras
+                            </div>
+                        }
+                        else
+                        {
+                            foreach (var improvement in Model.Property.PropertyImprovements)
+                            {
+                                <span class="badge bg-light text-dark border rounded-1 px-3 py-2 d-flex align-items-center"
+                                      style="font-size: 0.95rem;">
+                                    <i class="bi bi-check2-circle text-success me-2 fs-5"></i>
+                                    @improvement.Improvement!.Name
+                                </span>
+                            }
+                        }
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        @* COLUMNA DERECHA *@
+        <div class="col-md-4">
+
+            <!-- TARJETA CHATS -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th class="text-center fw-bold">Chats</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (Model.ChatClients != null && Model.ChatClients.Any())
+                            {
+                                foreach (var item in Model.ChatClients)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a class="text-decoration-none text-dark d-block"
+                                               asp-area=""
+                                               asp-controller="ChatMessage"
+                                               asp-action="Index"
+                                               asp-route-propertyId="@Model.Property.Id"
+                                               asp-route-agentId="@item.Id"
+                                               asp-route-clientId="@Model.Property.AgentId"
+                                               asp-route-propertyCode="@Model.Property.Code">
+
+                                                <div class="d-flex align-items-center">
+                                                    <img class="rounded-circle me-2"
+                                                         width="40"
+                                                         height="40"
+                                                         src="@(item.ProfileImagePath!)"
+                                                         alt="Imagen de perfil" />
+
+                                                    <div>
+                                                        <div class="fw-semibold">@item.FirstName</div>
+                                                        <small class="text-muted">@item.UserName</small>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td class="text-center text-muted py-4">
+                                        No hay chats para esta propiedad
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+
+            <!-- TARJETA OFERTAS -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th class="text-center fw-bold">
+                                    Clientes que han realizado ofertas
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (Model.OffersClients != null && Model.OffersClients.Any())
+                            {
+                                foreach (var item in Model.OffersClients)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a class="text-decoration-none text-dark d-block"
+                                               asp-area=""
+                                               asp-controller="Offer"
+                                               asp-action="RespondToOffers"
+                                               asp-route-propertyId="@Model.Property.Id"
+                                               asp-route-clientId="@item.Id">
+
+                                                <div class="d-flex align-items-center">
+                                                    <img class="rounded-circle me-2"
+                                                         width="40"
+                                                         height="40"
+                                                         src="@(item.ProfileImagePath!)"
+                                                         alt="Imagen de perfil" />
+
+                                                    <div>
+                                                        <div class="fw-semibold">@item.FirstName</div>
+                                                        <small class="text-muted">@item.UserName</small>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td class="text-center text-muted py-4">
+                                        No hay ofertas para esta propiedad
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

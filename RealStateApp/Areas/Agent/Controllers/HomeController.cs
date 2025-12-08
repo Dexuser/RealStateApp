@@ -25,7 +25,7 @@ public class HomeController
 
         var result = await _propertyService.GetAllByAgentIdAsync(agentId!);
         
-        var vm = _mapper.Map<List<PropertyViewModel>>(result.Value);
+        var vm = _mapper.Map<List<PropertyViewModel>>(result);
         
         return View(vm);
     }

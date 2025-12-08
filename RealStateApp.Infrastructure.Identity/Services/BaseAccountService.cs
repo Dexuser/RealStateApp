@@ -282,7 +282,8 @@ namespace RealStateApp.Infrastructure.Identity.Services
                            .Result.FirstOrDefault() ??
                        "",
                 IdentityCardNumber = user.IdentityCardNumber,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                ProfileImagePath = user.ProfileImagePath,
             }).ToList();
 
             return usersDtos;
@@ -468,55 +469,6 @@ namespace RealStateApp.Infrastructure.Identity.Services
             }
 
             return Result.Ok();
-        }
-
-        public async Task<Result<UserDto>> GetUserByIdResult(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-
-            if (user == null)
-                return Result<UserDto>.Fail("Usuario no encontrado");
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            var dto = _mapper.Map<UserDto>(user);
-            dto.Role = roles.FirstOrDefault() ?? "";
-
-            return Result<UserDto>.Ok(dto);
-        }
-
-        public async Task<Result<bool>> UpdateAgentProfileAsync(AgentProfileViewModel vm)
-        {
-            var user = await _userManager.FindByIdAsync(vm.Id);
-
-            if (user == null)
-                return Result<bool>.Fail("Usuario no encontrado");
-
-            user.FirstName = vm.FirstName;
-            user.LastName = vm.LastName;
-            user.PhoneNumber = vm.PhoneNumber;
-            user.Email = vm.Email;
-            user.UserName = vm.UserName;
-
-            if (vm.ProfileImage != null)
-            {
-                var newPath = FileHandler.Upload(
-                    vm.ProfileImage,
-                    user.Id,
-                    "agents",
-                    true,
-                    user.ProfileImagePath
-                );
-
-                user.ProfileImagePath = newPath;
-            }
-
-            var result = await _userManager.UpdateAsync(user);
-
-            if (!result.Succeeded)
-                return Result<bool>.Fail(result.Errors.Select(e => e.Description).ToList());
-
-            return Result<bool>.Ok(true);
         }
 
 

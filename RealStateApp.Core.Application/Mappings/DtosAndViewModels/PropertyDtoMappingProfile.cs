@@ -10,6 +10,7 @@ public class PropertyDtoMappingProfile : Profile
     public PropertyDtoMappingProfile()
     {
         CreateMap<PropertyDto, PropertyViewModel>().ReverseMap();
+        CreateMap<PropertyEditViewModel, PropertyViewModel>().ReverseMap();
     }
     
 }

@@ -7,7 +7,9 @@ using RealStateApp.Core.Application.Dtos.PropertyImage;
 using RealStateApp.Core.Application.Dtos.PropertyImprovement;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Application.ViewModels.Property;
+using RealStateApp.Core.Application.ViewModels.User;
 using RealStateApp.Core.Domain.Common;
+using RealStateApp.Core.Domain.Entities;
 using RealStateApp.Extensions;
 using RealStateApp.Handlers;
 
@@ -20,6 +22,8 @@ public class AgentPropertyController(
     IPropertyTypeService propertyTypeService,
     ISaleTypeService saleTypeService,
     IPropertyImageService propertyImageService, 
+    IBaseAccountService baseAccountService,
+    IOfferService offerService,
     IMapper mapper)
     : Controller
 {
@@ -34,12 +38,8 @@ public class AgentPropertyController(
     public async Task<IActionResult> Index()
     {
         var agentId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        var result = await _propertyService.GetPropertiesForMaintenanceAsync(agentId!);
-
-        
+        var result = await _propertyService.GetAllByAgentIdAsync(agentId!);
         var vm = _mapper.Map<List<PropertyViewModel>>(result);
-        
         return View(vm);
     }
 
@@ -91,7 +91,6 @@ public class AgentPropertyController(
         }
         var propertyCreatedId = result.Value;
         
-        // MAIN IMAGE
         if (vm.MainImage != null)
         {
             string imagePath = FileHandler.Upload(vm.MainImage, propertyCreatedId.ToString(), "properties")!;
@@ -107,7 +106,6 @@ public class AgentPropertyController(
             await _propertyImageService.AddAsync(mainImage);
         }
 
-        // ADDITIONAL IMAGES
         if (vm.AdditionalImages != null)
         {
             foreach (var img in vm.AdditionalImages)
@@ -126,7 +124,6 @@ public class AgentPropertyController(
             }
         }
 
-        // IMPROVEMENTS
         if (vm.SelectedImprovements.Any())
         {
             foreach (var improvementId in vm.SelectedImprovements)
@@ -146,14 +143,31 @@ public class AgentPropertyController(
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var result = await _propertyService.GetByIdForEditAsync(id);
-        
-        var vm = _mapper.Map<PropertyEditViewModel>(result.Value);
+        var result = await _propertyService.GetByIdAsync(id);
 
-        vm.PropertyTypes = await _propertyTypeService.GetSelectListAsync();
-        vm.SaleTypes = await _saleTypeService.GetSelectListAsync();
-        vm.Improvements  = await _propertyImprovementService.GetSelectListAsync();
-        
+        if (result == null)
+        {
+            ViewBag.Message = "No se encontro una propiedad con ese ID";
+            return RedirectToAction("Index");
+        }
+
+        var vm = new PropertyEditViewModel
+        {
+            Id = result.Id,
+            Code = result.Code,
+            PropertyTypeId = result.PropertyTypeId,
+            SaleTypeId = result.SaleTypeId,
+            Price = result.Price,
+            SizeInMeters = result.SizeInMeters,
+            Rooms = result.Rooms,
+            Bathrooms = result.Bathrooms,
+            Description = result.Description,
+            MainImage = null,
+            SelectedImprovements = result.PropertyImprovements.Select(pi => pi.ImprovementId).ToList(),
+            PropertyTypes = await _propertyTypeService.GetSelectListAsync(),
+            SaleTypes = await _saleTypeService.GetSelectListAsync(),
+            Improvements = await _propertyImprovementService.GetSelectListAsync()
+        };
         return View(vm);
     }
 
@@ -168,7 +182,67 @@ public class AgentPropertyController(
             return View(vm);
         }
 
-        var result = await _propertyService.EditPropertyAsync(vm);
+        var propertyDto = new PropertyDto
+        {
+            Id = vm.Id,
+            Code = vm.Code,
+            PropertyTypeId = vm.PropertyTypeId,
+            SaleTypeId = vm.SaleTypeId,
+            Price = vm.Price,
+            SizeInMeters = vm.SizeInMeters,
+            Rooms = vm.Rooms,
+            Bathrooms = vm.Bathrooms,
+            Description = vm.Description,
+            CreatedAt = DateTime.MinValue,
+            AgentId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "",
+        };
+        var result = await _propertyService.EditPropertyAsync(propertyDto);
+        if (result.IsFailure)
+        {
+            this.SendValidationErrorMessages(result);
+            return RedirectToAction("Index");
+        }
+        var images = await _propertyImageService.GetAllImagesOfThisProperty(propertyDto.Id);
+        
+
+            // NEW MAIN IMAGE
+            if (vm.MainImage != null)
+            {
+                var oldMainImage = images.FirstOrDefault(i => i.IsMain)!;
+                oldMainImage.ImagePath = FileHandler.Upload(vm.MainImage, propertyDto.Id.ToString(), "properties", true, oldMainImage.ImagePath) ?? "";
+                await _propertyImageService.UpdateAsync(oldMainImage.Id, oldMainImage);
+            }
+
+            // NEW ADDITIONAL IMAGES
+            if (vm.AdditionalImages != null && vm.AdditionalImages.Any())
+            {
+                await _propertyImageService.DeleteAllAdditionalImagesOfThisPropertyAsync(propertyDto.Id);
+                foreach (var file in vm.AdditionalImages)
+                {
+                    var path = FileHandler.Upload(file, propertyDto.Id.ToString(), "properties");
+                    await _propertyImageService.AddAsync(new PropertyImageDto
+                    {
+                        PropertyId = propertyDto.Id,
+                        ImagePath = path!,
+                        IsMain = false,
+                        Id = 0
+                    });
+                }
+            }
+
+            // DELETE OLD IMPROVEMENTS
+            await _propertyImprovementService.DeleteAllImprovementsOfAPropertyAsync(propertyDto.Id);
+            
+            // ADD NEW IMPROVEMENTS
+            foreach (var impId in vm.SelectedImprovements)
+            {
+                await _propertyImprovementService.AddAsync(new PropertyImprovementDto
+                {
+                    PropertyId = propertyDto.Id,
+                    ImprovementId = impId,
+                    Id = 0
+                });
+            }
        
         return RedirectToAction("Index");
     }
@@ -179,8 +253,8 @@ public class AgentPropertyController(
         var result = await _propertyService.GetByIdForDeleteAsync(id);
         if (result.IsFailure)
         {
-            var msg = result.GeneralError ?? string.Join("; ", result.Errors!);
-            return Problem(msg);
+            this.SendValidationErrorMessages(result);
+            return RedirectToAction("Index");
         }
         var vm = _mapper.Map<PropertyDeleteViewModel>(result.Value);
         return View(vm);
@@ -193,4 +267,17 @@ public class AgentPropertyController(
         
         return RedirectToAction("Index");
     }
+    
+    public async Task<IActionResult> Details(int id)
+    {
+        var vm = new AgentDetailsViewModel
+        {
+            ChatClients = 
+            _mapper.Map<List<UserViewModel>>(await baseAccountService.GetAllUserOfRole(Roles.Client)),
+            OffersClients = _mapper.Map<List<UserViewModel>>(await offerService.GetAllUsersWhoHasOfferOnThisProperty(id)),
+            Property = _mapper.Map<PropertyViewModel>(await _propertyService.GetByIdAsync(id)),
+        };
+        return View(vm);
+    }
+    
 }

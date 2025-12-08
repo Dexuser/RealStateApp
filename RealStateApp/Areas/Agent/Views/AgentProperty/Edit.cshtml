@@ -1,4 +1,4 @@
-﻿@model RealStateApp.Core.Application.ViewModels.Property.PropertyViewModel
+﻿@model RealStateApp.Core.Application.ViewModels.Property.PropertyEditViewModel
 
 @{
     ViewData["Title"] = "Editar Propiedad";
@@ -11,13 +11,13 @@
         </div>
         <div class="card-body">
 
-            @if ((ViewBag.PropertyTypes as IEnumerable<SelectListItem>)?.Any() != true ||
-                 (ViewBag.SaleTypes as IEnumerable<SelectListItem>)?.Any() != true ||
-                 (ViewBag.Improvements as IEnumerable<SelectListItem>)?.Any() != true)
+            @if (Model.PropertyTypes.Any() != true ||
+                  Model.SaleTypes.Any() != true ||
+                   Model.Improvements.Any() != true)
             {
                 <div class="alert alert-danger">
                     <i class="bi bi-exclamation-triangle"></i>
-                    <strong>No se puede cargar el formulario</strong><br />
+                    <strong>No se puede cargar el formulario</strong><br/>
                     Faltan datos maestros. Contacte al administrador.
                 </div>
                 <a asp-action="Index" class="btn btn-secondary">Volver al Listado</a>
@@ -25,15 +25,13 @@
             else
             {
                 <form asp-action="Edit" method="post" enctype="multipart/form-data">
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="Code" />
-                    <input type="hidden" asp-for="AgentId" />
-                    <input type="hidden" asp-for="CreatedAt" />
+                    <input type="hidden" asp-for="Id"/>
+                    <input type="hidden" asp-for="Code"/>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="PropertyTypeId" class="form-label">Tipo de Propiedad *</label>
-                            <select asp-for="PropertyTypeId" class="form-select" asp-items="ViewBag.PropertyTypes">
+                            <select asp-for="PropertyTypeId" class="form-select" asp-items="Model.PropertyTypes">
                                 <option value="">-- Seleccione --</option>
                             </select>
                             <span asp-validation-for="PropertyTypeId" class="text-danger"></span>
@@ -41,7 +39,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label asp-for="SaleTypeId" class="form-label">Tipo de Venta *</label>
-                            <select asp-for="SaleTypeId" class="form-select" asp-items="ViewBag.SaleTypes">
+                            <select asp-for="SaleTypeId" class="form-select" asp-items="Model.SaleTypes">
                                 <option value="">-- Seleccione --</option>
                             </select>
                             <span asp-validation-for="SaleTypeId" class="text-danger"></span>
@@ -50,7 +48,7 @@
 
                     <div class="mb-3">
                         <label asp-for="Price" class="form-label">Precio (RD$) *</label>
-                        <input asp-for="Price" type="number" step="0.01" min="0" class="form-control" />
+                        <input asp-for="Price" type="number" step="0.01" min="0" class="form-control"/>
                         <span asp-validation-for="Price" class="text-danger"></span>
                     </div>
 
@@ -63,19 +61,19 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label asp-for="SizeInMeters" class="form-label">Tamaño (m²) *</label>
-                            <input asp-for="SizeInMeters" type="number" step="0.01" min="0" class="form-control" />
+                            <input asp-for="SizeInMeters" type="number" step="0.01" min="0" class="form-control"/>
                             <span asp-validation-for="SizeInMeters" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label asp-for="Rooms" class="form-label">Habitaciones *</label>
-                            <input asp-for="Rooms" type="number" min="1" class="form-control" />
+                            <input asp-for="Rooms" type="number" min="1" class="form-control"/>
                             <span asp-validation-for="Rooms" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label asp-for="Bathrooms" class="form-label">Baños *</label>
-                            <input asp-for="Bathrooms" type="number" min="1" class="form-control" />
+                            <input asp-for="Bathrooms" type="number" min="1" class="form-control"/>
                             <span asp-validation-for="Bathrooms" class="text-danger"></span>
                         </div>
                     </div>
@@ -83,16 +81,16 @@
                     <div class="mb-3">
                         <label class="form-label">Mejoras</label>
                         <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
-                            @if (ViewBag.Improvements != null)
+                            @if (Model.Improvements != null)
                             {
-                                @foreach (SelectListItem item in ViewBag.Improvements)
+                                @foreach (var item in Model.Improvements)
                                 {
-                                    bool isChecked = Model.PropertyImprovements.Any(pi => pi.Id.ToString() == item.Value);
+                                    bool isChecked = Model.SelectedImprovements.Any(id => id.ToString() == item.Value);
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox"
-                                               name="SelectedImprovementIds" value="@item.Value"
+                                               name="SelectedImprovements" value="@item.Value"
                                                id="improvement_@item.Value"
-                                               @(isChecked ? "checked" : "") />
+                                               @(isChecked ? "checked" : "")/>
                                         <label class="form-check-label" for="improvement_@item.Value">
                                             @item.Text
                                         </label>
@@ -102,21 +100,18 @@
                         </div>
                     </div>
 
-                    <!-- Imágenes actuales -->
                     <div class="mb-3">
-                        <label class="form-label">Imágenes actuales</label>
-                        @if (Model.PropertyImages.Any() == true)
-                        {
-                            <div class="d-flex flex-wrap gap-2 mb-2">
-                                @foreach (var img in Model.PropertyImages)
-                                {
-                                    <img src="@img.ImagePath" style="width: 100px; height: 100px; object-fit: cover;" class="border rounded" alt=""/>
-                                }
-                            </div>
-                        }
-                        <label class="form-label mt-2">Agregar nuevas imágenes (opcional)</label>
-                        <input name="NewImages" type="file" class="form-control" accept="image/*" multiple />
-                        <small class="form-text text-muted">Las nuevas imágenes se añadirán a las existentes.</small>
+                        <label class="form-label">Imágen Principal *</label>
+                        <input name="MainImage" type="file" class="form-control" accept="image/*"  />
+                        <small class="form-text text-muted">Selecciona una imagen principal</small>
+                        <span asp-validation-for="MainImage" class="text-danger"></span>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label class="form-label">Imágenes (1-4) </label>
+                        <input name="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
+                        <small class="form-text text-muted">Selecciona entre 1 y 4 imágenes.</small>
+                        <span asp-validation-for="AdditionalImages" class="text-danger"></span>
                     </div>
 
                     <div class="d-grid gap-2 mt-4">
@@ -134,5 +129,5 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial"/>
 }

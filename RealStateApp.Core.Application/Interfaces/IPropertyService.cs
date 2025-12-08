@@ -7,12 +7,11 @@ namespace RealStateApp.Core.Application.Interfaces;
 public interface IPropertyService : IGenericService<PropertyDto>
 {
     Task<List<PropertyDto>> GetAllAvailablePropertiesAsync(PropertyFiltersDto filtersDto);
-    Task<Result<List<PropertyDto>>> GetAllByAgentIdAsync(string agentId);
+    Task<List<PropertyDto>> GetAllByAgentIdAsync(string agentId);
 
     Task<List<PropertyDto>> GetPropertiesForMaintenanceAsync(string agentId);
     Task<Result<int>> CreatePropertyAsync(PropertyDto vm);
-    Task<Result<PropertyEditViewModel>> GetByIdForEditAsync(int id);
-    Task<Result<bool>> EditPropertyAsync(PropertyEditViewModel vm);
+    Task<Result<bool>> EditPropertyAsync(PropertyDto vm);
     Task<Result<PropertyDeleteViewModel>> GetByIdForDeleteAsync(int id);
     Task<Result<bool>> DeletePropertyAsync(int id);
 }

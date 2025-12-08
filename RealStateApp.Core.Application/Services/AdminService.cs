@@ -39,6 +39,7 @@ public class AdminService : IAdminService
 
     public async Task<Result<UserDto>> Edit(UserSaveDto dto, string? origin)
     {
+        dto.Role = nameof(Roles.Admin); // Solo para rectificar. Al fin y al cabo este metodo es un decorador
         return await _accountServiceForWebApp.EditUser(dto, origin);
     }
 }

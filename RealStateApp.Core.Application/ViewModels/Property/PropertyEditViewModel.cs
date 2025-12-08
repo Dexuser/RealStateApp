@@ -30,18 +30,14 @@ public class PropertyEditViewModel
     [Required] [Range(1, 50)] public int Bathrooms { get; set; }
 
     [Required] public string Description { get; set; } = string.Empty;
-    
-    public List<PropertyImageViewModel> CurrentImages { get; set; } = new();
-
-    public List<int> ImagesToDelete { get; set; } = new();
 
     [Display(Name = "Nueva imagen principal (opcional)")]
-    public IFormFile? NewMainImage { get; set; }
+    public IFormFile? MainImage { get; set; }
 
     [Display(Name = "Nuevas imágenes adicionales")]
-    public List<IFormFile>? NewAdditionalImages { get; set; }
-
+    public List<IFormFile>? AdditionalImages { get; set; }
     public List<int> SelectedImprovements { get; set; } = new();
+    
 
     //Repito aqui tambien es solo para las vistas. Alna
     public List<SelectListItem> PropertyTypes { get; set; } = new();

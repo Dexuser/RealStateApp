@@ -1,4 +1,4 @@
-﻿@model RealStateApp.Core.Application.ViewModels.User.UserViewModel
+﻿@model RealStateApp.Core.Application.ViewModels.Agent.EditAgentViewModel
 
 @{
     ViewData["Title"] = "Mi Perfil";
@@ -52,7 +52,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Foto de Usuario</label>
-                            <input type="file" name="ProfileImage" class="form-control" accept="image/*" />
+                            <input type="file" asp-for="ImageProfile" class="form-control" accept="image/*" />
                             <small class="form-text text-muted">
                                 Deja este campo vacío si no deseas cambiar tu foto
                             </small>

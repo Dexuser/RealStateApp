@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RealStateApp.Core.Domain.Interfaces;
 using RealStateApp.Infrastructure.Persistence.Contexts;
 using RealStateApp.Infrastructure.Persistence.Repositories;
+using RealStateApp.Infrastructure.Persistence.Services;
 
 namespace RealStateApp.Infrastructure.Persistence;
 
@@ -37,7 +38,9 @@ public static class ServiceRegistration
             services.AddScoped<IPropertyImageRepository, PropertyImageRepository>();
             services.AddScoped<IPropertyImprovementRepository, PropertyImprovementRepository>();
             services.AddScoped<IPropertyTypeRepository, PropertyTypeRepository>();
-            services.AddScoped<ISaleTypeRepository, SaleTypeRepository>();           
+            services.AddScoped<ISaleTypeRepository, SaleTypeRepository>();
+
+            services.AddTransient<ICodeService, CodeService>();
         }
     }
 }

@@ -7,9 +7,9 @@ public interface IAgentService
 {
     Task<List<AgentWithPropertyCountDto>> GetAllAgentsWithCount();
     Task<List<UserDto>> GetAllAgents(bool onlyActive = false, string? name = null);
-    
     Task<Result> SetStatus(string userId, bool state);
     Task<Result> DeleteAsync(string userId);
-    
-    
+    Task<Result<UserDto>> Edit(UserSaveDto dto, string? origin);
+
+
 }
