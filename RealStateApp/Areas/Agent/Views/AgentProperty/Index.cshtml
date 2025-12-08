@@ -24,54 +24,78 @@
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @foreach (var prop in Model)
             {
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        @if (!string.IsNullOrEmpty(prop.FirstImageUrl))
-                        {
-                            <img src="@prop.FirstImageUrl" 
-                                 class="card-img-top" 
-                                 style="height: 200px; object-fit: cover;" 
-                                 alt="@prop.PropertyType" />
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm h-100">
+
+                        @{
+                            var imagePath = prop.PropertyImages.Single().ImagePath;
                         }
-                        else
-                        {
-                            <div class="bg-secondary d-flex align-items-center justify-content-center" 
-                                 style="height: 200px;">
-                                <i class="bi bi-house-door text-white" style="font-size: 3rem;"></i>
-                            </div>
-                        }
+
+                        <div class="position-relative">
+
+                            <img src="@imagePath"
+                                 class="card-img-top"
+                                 alt="Imagen de propiedad"
+                                 style="height: 180px; object-fit: cover;"/>
+
+                            @if (prop.IsAvailable)
+                            {
+                                <span class="badge bg-success position-absolute bottom-0 end-0 m-2">Disponible</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger position-absolute bottom-0 end-0 m-2">Vendido</span>
+                            }
+
+                        </div>
 
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="badge bg-primary">@prop.PropertyType</span>
-                                <span class="badge bg-info">@prop.SaleType</span>
-                            </div>
-
-                            <h5 class="card-title">Código: @prop.Code</h5>
-
-                            <p class="card-text">
-                                <strong class="text-success">RD$ @prop.Price.ToString("N2")</strong>
+                            <h5 class="card-title">Tipo: @prop.PropertyType!.Name</h5>
+                            <p class="card-text text-muted mb-2">
+                                Codigo: @prop.Code
+                            </p>
+                            <p class="card-text text-muted mb-2">
+                                Tipo de venta: @prop.SaleType!.Name
                             </p>
 
-                            <div class="d-flex justify-content-between text-muted small mb-3">
-                                <span><i class="bi bi-door-closed"></i> @prop.Rooms hab.</span>
-                                <span><i class="bi bi-droplet"></i> @prop.Bathrooms baños</span>
-                                <span><i class="bi bi-rulers"></i> @prop.SizeInMeters m²</span>
-                            </div>
+                            <p class="fw-bold text-primary">
+                                RD$ @prop.Price.ToString("N0")
+                            </p>
 
-                            <div class="d-grid gap-2">
-                                <div class="btn-group" role="group">
-                                    <a asp-action="Edit" asp-route-id="@prop.Id" 
-                                       class="btn btn-sm btn-warning text-white">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@prop.Id" 
-                                       class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i> Eliminar
+                            <ul class="list-inline small">
+                                <li class="list-inline-item"><i class="bi bi-door-open"></i> @prop.Rooms Hab.</li>
+                                <li class="list-inline-item"><i class="bi bi-droplet"></i> @prop.Bathrooms Baños</li>
+                                <li class="list-inline-item"><i
+                                        class="bi bi-bounding-box-circles"></i> @prop.SizeInMeters mt
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="card-footer bg-white">
+                            <div class="d-flex w-100">
+
+                                <div class="flex-grow-1 me-2">
+                                    <a asp-action="Details" asp-route-id="@prop.Id"
+                                       class="btn btn-outline-primary w-100">
+                                        Detalles
                                     </a>
                                 </div>
+
+                                <div class="flex-grow-1 me-2">
+                                    <a asp-action="Edit" asp-route-id="@prop.Id" class="btn btn-outline-warning w-100">
+                                        Editar
+                                    </a>
+                                </div>
+
+                                <div class="flex-grow-1 me-2">
+                                    <a asp-action="Delete" asp-route-id="@prop.Id" class="btn btn-outline-danger w-100">
+                                        Eliminar
+                                    </a>
+                                </div>
+
                             </div>
                         </div>
+
                     </div>
                 </div>
             }
