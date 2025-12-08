@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using RealStateApp.Core.Application.Dtos.Improvement;
 using RealStateApp.Core.Domain.Interfaces;
 
@@ -11,7 +12,7 @@ public class GetAllImprovementsQueryHandler
 {
     private readonly IImprovementRepository _repo;
 
-    public GetAllImprovementsQueryHandler(IImprovementRepository repo)
+    public GetAllImprovementsQueryHandler(IImprovementRepository repo, IMapper mapper)
     {
         _repo = repo;
     }

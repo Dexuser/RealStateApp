@@ -12,6 +12,7 @@ using RealStateApp.Core.Application.Services;
 using RealStateApp.Core.Domain.Entities;
 using RealStateApp.Infrastructure.Persistence.Contexts;
 using RealStateApp.Infrastructure.Persistence.Repositories;
+using RealStateApp.Infrastructure.Persistence.Services;
 
 namespace RealStateApp.Unit.Tests.Services;
 
@@ -341,9 +342,18 @@ public class PropertyTypeServiceTests
         var saleTypeRepository = new SaleTypeRepository(context);
         var propertyRepository = new PropertyRepository(context);
         var propertyTypeRepository = new PropertyTypeRepository(context);
-
+        var codeService = new Mock<ICodeService>();
+        codeService
+            .Setup(c => c.GenerateIdentifier())
+            .ReturnsAsync(() =>
+            {
+                var random = new Random();
+                var code = random.Next(1, 999999);
+                return code.ToString("D6");
+            });       
+        
         var service =  new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
-            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
+            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository, codeService.Object );
 
         var filters = new PropertyFiltersDto
         {
@@ -454,9 +464,18 @@ public class PropertyTypeServiceTests
         var saleTypeRepository = new SaleTypeRepository(context);
         var propertyRepository = new PropertyRepository(context);
         var propertyTypeRepository = new PropertyTypeRepository(context);
+        var codeService = new Mock<ICodeService>();
+        codeService
+            .Setup(c => c.GenerateIdentifier())
+            .ReturnsAsync(() =>
+            {
+                var random = new Random();
+                var code = random.Next(1, 999999);
+                return code.ToString("D6");
+            });
 
         var service =  new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
-            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
+            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository, codeService.Object);
 
         var filters = new PropertyFiltersDto
         {
@@ -579,9 +598,18 @@ public class PropertyTypeServiceTests
         var saleTypeRepository = new SaleTypeRepository(context);
         var propertyRepository = new PropertyRepository(context);
         var propertyTypeRepository = new PropertyTypeRepository(context);
+        var codeService = new Mock<ICodeService>();
+        codeService
+            .Setup(c => c.GenerateIdentifier())
+            .ReturnsAsync(() =>
+            {
+                var random = new Random();
+                var code = random.Next(1, 999999);
+                return code.ToString("D6");
+            });
 
         var service =  new PropertyService(propertyRepository, _mapper, accountMock.Object, propertyImageRepository,
-            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository);
+            propertyImprovementRepository, improvementRepository, saleTypeRepository, propertyTypeRepository, codeService.Object);
 
         var filters = new PropertyFiltersDto
         {
