@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using RealStateApp.Core.Application.Dtos.Improvement;
 using RealStateApp.Core.Domain.Interfaces;
 
@@ -16,7 +17,7 @@ public class UpdateImprovementCommandHandler
 {
     private readonly IImprovementRepository _repo;
 
-    public UpdateImprovementCommandHandler(IImprovementRepository repo)
+    public UpdateImprovementCommandHandler(IImprovementRepository repo, IMapper mapper)
     {
         _repo = repo;
     }

@@ -26,7 +26,6 @@ public class DeleteImprovementCommandHandler
             throw new KeyNotFoundException($"La mejora con ID {request.Id} no existe.");
 
         await _repo.DeleteAsync(entity.Id);
-
         return true;
     }
 }

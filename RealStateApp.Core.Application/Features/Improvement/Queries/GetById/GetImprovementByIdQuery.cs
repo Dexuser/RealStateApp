@@ -1,5 +1,7 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using RealStateApp.Core.Application.Dtos.Improvement;
+using RealStateApp.Core.Application.Exceptions;
 using RealStateApp.Core.Domain.Interfaces;
 
 namespace RealStateApp.Core.Application.Features.Improvement.Queries.GetById;
@@ -14,7 +16,7 @@ public class GetImprovementByIdQueryHandler
 {
     private readonly IImprovementRepository _repo;
 
-    public GetImprovementByIdQueryHandler(IImprovementRepository repo)
+    public GetImprovementByIdQueryHandler(IImprovementRepository repo, IMapper mapper)
     {
         _repo = repo;
     }
@@ -24,7 +26,7 @@ public class GetImprovementByIdQueryHandler
         var entity = await _repo.GetByIdAsync(request.Id);
 
         if (entity == null)
-            return null;
+            throw new ApiException("Improvement not found");
 
         return new ImprovementApiDto
         {
