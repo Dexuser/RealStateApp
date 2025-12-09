@@ -25,7 +25,6 @@
 
     <ItemGroup>
       <Folder Include="Areas\Client\Controllers\" />
-      <Folder Include="wwwroot\Images\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -190,17 +190,30 @@
                                                asp-route-propertyCode="@Model.Property.Code">
 
                                                 <div class="d-flex align-items-center">
-                                                    <img class="rounded-circle me-2"
-                                                         width="40"
-                                                         height="40"
-                                                         src="@(item.ProfileImagePath!)"
-                                                         alt="Imagen de perfil" />
+                                                    @if (!string.IsNullOrEmpty(item.ProfileImagePath))
+                                                    {
+                                                        <img class="rounded-circle me-2"
+                                                             width="40"
+                                                             height="40"
+                                                             style="object-fit: cover;"
+                                                             src="@item.ProfileImagePath"
+                                                             alt="Imagen de perfil" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                                                             style="width: 40px; height: 40px;">
+                                                            <i class="bi bi-person-fill text-white"
+                                                               style="font-size: 1.5rem;"></i>
+                                                        </div>
+                                                    }
 
                                                     <div>
-                                                        <div class="fw-semibold">@item.FirstName</div>
+                                                        <div class="fw-semibold">@item.FirstName @item.LastName</div>
                                                         <small class="text-muted">@item.UserName</small>
                                                     </div>
                                                 </div>
+
                                             </a>
                                         </td>
                                     </tr>
@@ -241,6 +254,7 @@
                                 {
                                     <tr>
                                         <td>
+
                                             <a class="text-decoration-none text-dark d-block"
                                                asp-area=""
                                                asp-controller="Offer"
@@ -249,17 +263,30 @@
                                                asp-route-clientId="@item.Id">
 
                                                 <div class="d-flex align-items-center">
-                                                    <img class="rounded-circle me-2"
-                                                         width="40"
-                                                         height="40"
-                                                         src="@(item.ProfileImagePath!)"
-                                                         alt="Imagen de perfil" />
+                                                    @if (!string.IsNullOrEmpty(item.ProfileImagePath))
+                                                    {
+                                                        <img class="rounded-circle me-2"
+                                                             width="40"
+                                                             height="40"
+                                                             style="object-fit: cover;"
+                                                             src="@item.ProfileImagePath"
+                                                             alt="Imagen de perfil" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                                                             style="width: 40px; height: 40px;">
+                                                            <i class="bi bi-person-fill text-white"
+                                                               style="font-size: 1.5rem;"></i>
+                                                        </div>
+                                                    }
 
                                                     <div>
-                                                        <div class="fw-semibold">@item.FirstName</div>
+                                                        <div class="fw-semibold">@item.FirstName @item.LastName</div>
                                                         <small class="text-muted">@item.UserName</small>
                                                     </div>
                                                 </div>
+
                                             </a>
                                         </td>
                                     </tr>
