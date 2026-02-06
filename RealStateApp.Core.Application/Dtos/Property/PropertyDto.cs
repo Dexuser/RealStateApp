@@ -34,7 +34,7 @@ public class PropertyDto
 
     // Navigation
     public ICollection<PropertyImageDto> PropertyImages { get; set; } = [];
-    public List<ImprovementDto> PropertyImprovements { get; set; } = [];
+    public List<PropertyImprovementDto> PropertyImprovements { get; set; } = [];
     public ICollection<OfferDto> Offers { get; set; } = [];
     public ICollection<ChatMessageDto> ChatMessages { get; set; } = [];
     public ICollection<FavoritePropertyDto> FavoriteProperties { get; set; } = [];

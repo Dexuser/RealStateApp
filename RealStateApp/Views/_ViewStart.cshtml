@@ -1,12 +1,29 @@
-﻿@{
-    if (User.Identity == null)
+﻿@using RealStateApp.Core.Domain.Common
+
+@{
+    if (!User.Identity.IsAuthenticated)
     {
         Layout = "_LayoutBase";
     }
     else
     {
-        Layout = User.Identity.IsAuthenticated 
-            ? "~/Areas/Client/Views/Shared/_Layout.cshtml" : 
-            "_LayoutBase";       
+        string layoutPath = "_LayoutBase"; 
+
+        switch (User)
+        {
+            case var u when u.IsInRole(nameof(Roles.Client)):
+                layoutPath = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+                break;
+
+            case var u when u.IsInRole(nameof(Roles.Agent)):
+                layoutPath = "~/Areas/Agent/Views/Shared/_Layout.cshtml";
+                break;
+
+            case var u when u.IsInRole(nameof(Roles.Admin)):
+                layoutPath = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+                break;
+        }
+
+        Layout = layoutPath;
     }
 }

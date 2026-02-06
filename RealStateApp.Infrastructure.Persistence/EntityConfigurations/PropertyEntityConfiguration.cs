@@ -29,12 +29,12 @@ public class PropertyEntityConfiguration : IEntityTypeConfiguration<Property>
         builder.HasOne(p => p.PropertyType)
             .WithMany(pt => pt.Properties)
             .HasForeignKey(p => p.PropertyTypeId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(p => p.SaleType)
             .WithMany(st => st.Properties)
             .HasForeignKey(p => p.SaleTypeId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         // La relación con propertyImages está configurada desde propertyImages
 

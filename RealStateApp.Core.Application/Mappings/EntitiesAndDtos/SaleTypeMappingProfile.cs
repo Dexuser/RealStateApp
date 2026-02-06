@@ -9,5 +9,6 @@ public class SaleTypeMappingProfile : Profile
     public SaleTypeMappingProfile()
     {
         CreateMap<SaleType, SaleTypeDto>().ReverseMap();
+        CreateMap<SaleType, SaleTypeApiDto>().ReverseMap();
     }
 }

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealStateApp.Core.Application.Dtos.Offer;
 using RealStateApp.Core.Application.Interfaces;
@@ -58,5 +59,26 @@ public class OfferController : Controller
                 propertyId = offerViewModel.PropertyId,
                 clientId = dto.UserId
             });
+    }
+
+    public async Task<IActionResult> RespondToOffers(int propertyId, string clientId)
+    {
+        var offers = await _offerService.GetAllOffersOfThisClientOnThisProperty(clientId, propertyId);
+        var model = new OfferListViewModel
+        {
+            PropertyId = propertyId,
+            ClientId = clientId,
+            CanCreateOffer = !offers.Any(o => o.Status == OfferStatus.Pending || o.Status == OfferStatus.Accepted),
+            Offers = _mapper.Map<List<OfferViewModel>>(offers),
+        };
+        return View(model);
+    }
+    
+    [Authorize(Roles = $"{nameof(Roles.Agent)}")]
+    [HttpPost]
+    public async Task<IActionResult> Decide(int offerId, bool accepted)
+    {
+        var offers = await _offerService.RespondOffer(offerId, accepted);
+       return RedirectToAction(nameof(RespondToOffers));
     }
 }

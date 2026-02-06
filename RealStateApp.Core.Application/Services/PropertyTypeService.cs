@@ -51,10 +51,7 @@ public class PropertyTypeService :  GenericServices<PropertyType, PropertyTypeDt
     public override async Task<Result> DeleteAsync(int id)
     {
         var deleteResult = await base.DeleteAsync(id);
-        if (deleteResult.IsSuccess)
-        {
-            var rowAffected = await _propertyRepository.GetAllQueryable().Where(p => p.PropertyTypeId == id).ExecuteDeleteAsync();
-        }
+        // Borrar un tipo de propiedad hace que se borren las propiedades en cascada.
         return deleteResult;
     }
 }

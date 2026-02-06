@@ -23,6 +23,7 @@ public class UserDtoMappingProfile : Profile
         CreateMap<UserDto, CreateDeveloperViewModel>().ReverseMap();
         CreateMap<UserDto, EditDevViewModel>().ReverseMap();
         CreateMap<UserDto, CreateAdminViewModel>().ReverseMap();
+        CreateMap<UserViewModel, UserSaveDto>().ReverseMap();
         CreateMap<UserDto, EditAdminViewModel>()
             .ReverseMap()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));

@@ -47,6 +47,7 @@ public class AgentHomeController : Controller
             Rooms = filters.Rooms,
             ClientId = userId,
             OnlyFavorites = false,
+            PropertyCode = filters.PropertyCode
         };
         
         var model = new AgentPropertiesViewModel()

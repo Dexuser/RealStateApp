@@ -7,5 +7,7 @@ namespace RealStateApp.Core.Application.Interfaces;
 public interface IPropertyImprovementService :  IGenericService<PropertyImprovementDto>
 {
     Task<List<SelectListItem>> GetSelectListAsync();
+    
+    Task<Result> DeleteAllImprovementsOfAPropertyAsync(int propertyId);
 
 }

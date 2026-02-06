@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.PropertyImprovement;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Domain.Entities;
@@ -31,5 +32,19 @@ public class PropertyImprovementService: GenericServices<PropertyImprovement, Pr
                 Value = t.Id.ToString(),
                 Text = t.Name
             }).ToList();
+    }
+
+    public async Task<Result> DeleteAllImprovementsOfAPropertyAsync(int propertyId)
+    {
+        try
+        {
+            await _propertyImprovementRepository.GetAllQueryable().Where(pi => pi.PropertyId == propertyId).ExecuteDeleteAsync();
+            return Result.Ok();
+        }
+        catch (Exception e)
+        {
+            return Result.Fail("An error ocurred while trying to delete all improvements of a property");
+        }
+
     }
 }

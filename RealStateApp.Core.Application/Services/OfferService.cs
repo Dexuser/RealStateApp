@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.Offer;
+using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Domain.Common;
 using RealStateApp.Core.Domain.Entities;
@@ -12,9 +13,13 @@ public class OfferService : GenericServices<Offer, OfferDto> , IOfferService
 {
     private readonly IOfferRepository _offerRepository;
     private readonly IMapper _mapper;
-    public OfferService(IOfferRepository repository, IMapper mapper) : base(repository, mapper)
+    private readonly IBaseAccountService _baseAccountService;
+    private readonly IPropertyRepository _propertyRepository;
+    public OfferService(IOfferRepository repository, IMapper mapper, IBaseAccountService baseAccountService, IPropertyRepository propertyRepository) : base(repository, mapper)
     {
         _mapper = mapper;
+        _baseAccountService = baseAccountService;
+        _propertyRepository = propertyRepository;
         _offerRepository = repository;
     }
 
@@ -41,5 +46,51 @@ public class OfferService : GenericServices<Offer, OfferDto> , IOfferService
             .ToListAsync();
         
         return query;
+    }
+    
+
+    public async Task<Result> RespondOffer(int offerId, bool acepted)
+    {
+        var offer =  await _offerRepository.GetByIdAsync(offerId);
+        if (offer == null || offer.Status != OfferStatus.Pending)
+        {
+            return Result.Fail("Offer not found");
+        }
+
+        if (acepted)
+        {
+            offer.Status = OfferStatus.Accepted;
+            await _offerRepository.UpdateAsync(offer.Id, offer);
+            
+            var property = await _propertyRepository.GetByIdAsync(offer.PropertyId);
+            property!.IsAvailable = false;
+
+            await _offerRepository.GetAllQueryable()
+                .Where(x => x.PropertyId == offer.PropertyId 
+                            && x.Status == OfferStatus.Pending 
+                            && x.Id != offer.Id)
+                .ExecuteUpdateAsync(update =>
+                    update.SetProperty(o => o.Status, o => OfferStatus.Rejected)
+                );
+
+            
+            await _propertyRepository.UpdateAsync(property.Id, property);
+            
+            return Result.Ok();
+        }
+        
+        offer.Status = OfferStatus.Rejected;
+        await _offerRepository.UpdateAsync(offer.Id, offer);
+        return Result.Ok();
+    }
+
+    public async Task<List<UserDto>> GetAllUsersWhoHasOfferOnThisProperty(int propertyId)
+    {
+        var clientsIds = _offerRepository.GetAllQueryable().AsNoTracking()
+            .Where(x => x.PropertyId == propertyId)
+            .Select(x => x.UserId).ToList();
+        
+        var users = await _baseAccountService.GetUsersByIds(clientsIds);
+        return users;
     }
 }

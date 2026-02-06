@@ -1,5 +1,6 @@
 using RealStateApp.Core.Application.Dtos.Login;
 using RealStateApp.Core.Application.Dtos.User;
+using RealStateApp.Core.Application.ViewModels.Agent;
 using RealStateApp.Core.Domain.Common;
 
 namespace RealStateApp.Core.Application.Interfaces;

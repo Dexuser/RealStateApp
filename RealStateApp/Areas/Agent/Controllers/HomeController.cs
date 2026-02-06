@@ -24,14 +24,8 @@ public class HomeController
         var agentId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         var result = await _propertyService.GetAllByAgentIdAsync(agentId!);
-
-        if (result.IsFailure)
-        {
-            var msg = result.GeneralError ?? string.Join("; ", result.Errors!);
-            return Problem(msg);
-        }
         
-        var vm = _mapper.Map<List<AgentPropertiesViewModel>>(result.Value);
+        var vm = _mapper.Map<List<PropertyViewModel>>(result);
         
         return View(vm);
     }

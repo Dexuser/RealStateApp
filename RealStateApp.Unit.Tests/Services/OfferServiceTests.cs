@@ -1,12 +1,15 @@
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using RealStateApp.Core.Application.Dtos.Offer;
+using RealStateApp.Core.Application.Interfaces;
 using RealStateApp.Core.Application.Mappings.DtosAndViewModels;
 using RealStateApp.Core.Application.Mappings.EntitiesAndDtos;
 using RealStateApp.Core.Application.Services;
 using RealStateApp.Core.Domain.Common;
 using RealStateApp.Core.Domain.Entities;
+using RealStateApp.Core.Domain.Interfaces;
 using RealStateApp.Infrastructure.Persistence.Contexts;
 using RealStateApp.Infrastructure.Persistence.Repositories;
 
@@ -36,7 +39,10 @@ public class OfferServiceTests
     {
         var context = new RealStateAppContext(_dbOptions);
         var repository = new OfferRepository(context);
-        return new OfferService(repository, _mapper);
+        var accountServiceMock = new Mock<IBaseAccountService>();
+        var propertyRepositoryMock = new PropertyRepository(context);
+        
+        return new OfferService(repository, _mapper, accountServiceMock.Object, propertyRepositoryMock);
     }
 
     private async Task SeedDependencies(RealStateAppContext context)
@@ -230,7 +236,9 @@ public class OfferServiceTests
         await context.SaveChangesAsync();
 
         var repository = new OfferRepository(context);
-        var service = new OfferService(repository, _mapper);
+        var accountServiceMock = new Mock<IBaseAccountService>();
+        var propertyRepositoryMock = new PropertyRepository(context);
+        var service = new OfferService(repository, _mapper, accountServiceMock.Object, propertyRepositoryMock);
 
         // Act
         var result = await service.DeleteAsync(1);

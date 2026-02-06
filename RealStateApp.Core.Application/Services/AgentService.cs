@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RealStateApp.Core.Application.Dtos.Agent;
 using RealStateApp.Core.Application.Dtos.User;
 using RealStateApp.Core.Application.Interfaces;
+using RealStateApp.Core.Application.ViewModels.Agent;
 using RealStateApp.Core.Domain.Common;
 using RealStateApp.Core.Domain.Interfaces;
 
@@ -12,9 +13,9 @@ public class AgentService : IAgentService
     private readonly IBaseAccountService _accountServiceForWebApp;
     private readonly IPropertyRepository _propertyRepository;
 
-    public AgentService(IBaseAccountService accountServiceForWebApp, IPropertyRepository propertyRepository)
+    public AgentService(IBaseAccountService accountService, IPropertyRepository propertyRepository)
     {
-        _accountServiceForWebApp = accountServiceForWebApp;
+        _accountServiceForWebApp = accountService;
         _propertyRepository = propertyRepository;
     }
 
@@ -64,5 +65,10 @@ public class AgentService : IAgentService
              var rowAffected = await _propertyRepository.GetAllQueryable().Where(property => property.AgentId == userId).ExecuteDeleteAsync();
          }
          return deleteResult;
+    }
+    public async Task<Result<UserDto>> Edit(UserSaveDto dto, string? origin)
+    {
+        dto.Role = nameof(Roles.Agent); // Solo para rectificar. Al fin y al cabo este metodo es un decorador
+        return await _accountServiceForWebApp.EditUser(dto, origin);
     }
 }
