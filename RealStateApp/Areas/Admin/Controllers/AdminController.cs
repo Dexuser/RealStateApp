@@ -63,7 +63,9 @@ public class AdminController : Controller
 
         if (createResult.IsFailure)
         {
+            this.SendValidationErrorMessages(createResult);
             return View(model);
+            
         }
         return RedirectToAction(nameof(Index));
     }
